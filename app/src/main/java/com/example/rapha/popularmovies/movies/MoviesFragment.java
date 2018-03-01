@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ public class MoviesFragment extends Fragment {
     private MoviesAdapter moviesAdapter;
     private RecyclerView posterRv;
     private ProgressBar loadingPb;
+    private int currentPage = 1;
 
     public MoviesFragment() {
     }
@@ -44,35 +46,58 @@ public class MoviesFragment extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_COLUMN_SPAN);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
+        posterRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (!recyclerView.canScrollVertically(1) && moviesAdapter.getItemCount() >= 20 && dy > 0) {
+                    Log.d(TAG, "loading additional data");
+                    loadData();
+                }
+            }
+        });
 
-        new MovieDbQueryTask().execute(getString(R.string.api_key));
+        loadData();
 
         return view;
     }
 
+    private void incrementCurrentPage() {
+        currentPage++;
+        Log.d(TAG, "current page is set to " + currentPage);
+    }
+
+    private void loadData() {
+        String apiKey = getString(R.string.api_key);
+        new MovieDbQueryTask().execute(apiKey, String.valueOf(currentPage));
+    }
+
     private void showLoadingStatus() {
         loadingPb.setVisibility(View.VISIBLE);
-        posterRv.setVisibility(View.GONE);
     }
 
     private void showPosterGrid() {
         loadingPb.setVisibility(View.GONE);
-        posterRv.setVisibility(View.VISIBLE);
     }
 
     class MovieDbQueryTask extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
-            moviesAdapter.swapMovies(movies);
+            if (currentPage == 1) {
+                moviesAdapter.swapMovies(movies);
+            } else {
+                moviesAdapter.appendMovieList(movies);
+            }
             showPosterGrid();
+            incrementCurrentPage();
         }
 
         @Override
         protected List<Movie> doInBackground(String... strings) {
             String apiKey = strings[0];
+            String pageToLoad = strings[1];
             try {
-                String jsonData = MovieDbNetworkUtils.fetchPopularMovies(apiKey);
+                String jsonData = MovieDbNetworkUtils.fetchPopularMovies(apiKey, pageToLoad);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {

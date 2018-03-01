@@ -18,10 +18,11 @@ public class MovieDbNetworkUtils {
     private final static String POPULAR_PATH = "popular";
     private final static String TOP_RATED_PATH = "top_rated";
 
+    private final static String PAGE_PARA = "page";
     private final static String API_KEY_PARA = "api_key";
 
-    public static String fetchPopularMovies(String apiKey) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(POPULAR_PATH, apiKey).openConnection();
+    public static String fetchPopularMovies(String apiKey, String page) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(POPULAR_PATH, apiKey, page).openConnection();
         try {
             BufferedInputStream stream = new BufferedInputStream(connection.getInputStream());
             Scanner scanner = new Scanner(stream);
@@ -38,11 +39,12 @@ public class MovieDbNetworkUtils {
         }
     }
 
-    private static URL buildQueryURL(String path, String apiKey) {
+    private static URL buildQueryURL(String path, String apiKey, String page) {
         Uri uri = Uri.parse(MOVIE_DB_BASE_URL);
         uri = uri.buildUpon()
                 .appendEncodedPath(path)
                 .appendQueryParameter(API_KEY_PARA, apiKey)
+                .appendQueryParameter(PAGE_PARA, page)
                 .build();
         URL url = null;
         try {

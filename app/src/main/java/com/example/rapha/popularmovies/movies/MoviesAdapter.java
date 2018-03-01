@@ -39,6 +39,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         }
     }
 
+    public void appendMovieList(List<Movie> movies) {
+        if (movies != null) {
+            this.movies.addAll(movies);
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
         holder.bind(movies.get(position));
