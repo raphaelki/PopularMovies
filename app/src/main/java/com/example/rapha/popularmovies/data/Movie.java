@@ -14,7 +14,32 @@ public class Movie {
         this.posterURL = posterURL;
         this.originalTitle = originalTitle;
         this.plot = plot;
+
         this.releaseDate = releaseDate;
         this.userRating = userRating;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getPosterURL() {
+        return posterURL;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public String getPlot() {
+        return plot;
+    }
+
+    public String getReleaseDate() {
+        return releaseDate;
+    }
+
+    public String getUserRating() {
+        return userRating;
     }
 }

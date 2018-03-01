@@ -3,10 +3,14 @@ package com.example.rapha.popularmovies.movies;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
+import com.example.rapha.popularmovies.utils.MovieDbJsonUtils;
 import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +35,9 @@ public class MoviesActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
-            super.onPostExecute(movies);
+            for (Movie movie : movies) {
+                Log.d(TAG, movie.getTitle());
+            }
         }
 
         @Override
@@ -39,6 +45,11 @@ public class MoviesActivity extends AppCompatActivity {
             String apiKey = strings[0];
             try {
                 String jsonData = MovieDbNetworkUtils.fetchPopularMovies(apiKey);
+                try {
+                    return MovieDbJsonUtils.parseMovieDbJson(jsonData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
