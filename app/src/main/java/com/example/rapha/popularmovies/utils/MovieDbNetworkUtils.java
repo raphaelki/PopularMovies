@@ -12,17 +12,15 @@ import java.util.Scanner;
 
 public class MovieDbNetworkUtils {
 
+    public final static String POPULAR_PATH = "popular";
+    public final static String TOP_RATED_PATH = "top_rated";
     private final static String TAG = MovieDbNetworkUtils.class.getSimpleName();
-
     private final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie";
-    private final static String POPULAR_PATH = "popular";
-    private final static String TOP_RATED_PATH = "top_rated";
-
     private final static String PAGE_PARA = "page";
     private final static String API_KEY_PARA = "api_key";
 
-    public static String fetchPopularMovies(String apiKey, String page) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(POPULAR_PATH, apiKey, page).openConnection();
+    public static String fetchMovies(String apiKey, String page, String sortOrder) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(sortOrder, apiKey, page).openConnection();
         try {
             BufferedInputStream stream = new BufferedInputStream(connection.getInputStream());
             Scanner scanner = new Scanner(stream);
@@ -39,10 +37,10 @@ public class MovieDbNetworkUtils {
         }
     }
 
-    private static URL buildQueryURL(String path, String apiKey, String page) {
+    private static URL buildQueryURL(String sortOrder, String apiKey, String page) {
         Uri uri = Uri.parse(MOVIE_DB_BASE_URL);
         uri = uri.buildUpon()
-                .appendEncodedPath(path)
+                .appendEncodedPath(sortOrder)
                 .appendQueryParameter(API_KEY_PARA, apiKey)
                 .appendQueryParameter(PAGE_PARA, page)
                 .build();

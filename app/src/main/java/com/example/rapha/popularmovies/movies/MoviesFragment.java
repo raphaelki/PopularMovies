@@ -31,6 +31,7 @@ public class MoviesFragment extends Fragment {
     private RecyclerView posterRv;
     private ProgressBar loadingPb;
     private int currentPage = 1;
+    private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
 
     public MoviesFragment() {
     }
@@ -51,7 +52,7 @@ public class MoviesFragment extends Fragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                    Log.d(TAG, "loading additional data");
+                    Log.d(TAG, "Loading additional data");
                     loadData();
                 }
             }
@@ -62,6 +63,17 @@ public class MoviesFragment extends Fragment {
         return view;
     }
 
+    public void setSortOrder(String sortOrder) {
+        this.sortOrder = sortOrder;
+        moviesAdapter.clearMovieList();
+        resetCurrentPage();
+        loadData();
+    }
+
+    private void resetCurrentPage() {
+        currentPage = 1;
+    }
+
     private void incrementCurrentPage() {
         currentPage++;
         Log.d(TAG, "current page is set to " + currentPage);
@@ -69,14 +81,14 @@ public class MoviesFragment extends Fragment {
 
     private void loadData() {
         String apiKey = getString(R.string.api_key);
-        new MovieDbQueryTask().execute(apiKey, String.valueOf(currentPage));
+        new MovieDbQueryTask().execute(apiKey, String.valueOf(currentPage), sortOrder);
     }
 
-    private void showLoadingStatus() {
+    private void showProgressBar() {
         loadingPb.setVisibility(View.VISIBLE);
     }
 
-    private void showPosterGrid() {
+    private void hideProgressBar() {
         loadingPb.setVisibility(View.GONE);
     }
 
@@ -89,7 +101,7 @@ public class MoviesFragment extends Fragment {
             } else {
                 moviesAdapter.appendMovieList(movies);
             }
-            showPosterGrid();
+            hideProgressBar();
             incrementCurrentPage();
         }
 
@@ -97,8 +109,9 @@ public class MoviesFragment extends Fragment {
         protected List<Movie> doInBackground(String... strings) {
             String apiKey = strings[0];
             String pageToLoad = strings[1];
+            String sortOrder = strings[2];
             try {
-                String jsonData = MovieDbNetworkUtils.fetchPopularMovies(apiKey, pageToLoad);
+                String jsonData = MovieDbNetworkUtils.fetchMovies(apiKey, pageToLoad, sortOrder);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {
@@ -112,7 +125,7 @@ public class MoviesFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            showLoadingStatus();
+            showProgressBar();
         }
     }
 }

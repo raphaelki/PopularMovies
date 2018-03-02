@@ -48,6 +48,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         }
     }
 
+    public void clearMovieList() {
+        movies.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
         holder.bind(movies.get(position));
