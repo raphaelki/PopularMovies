@@ -18,13 +18,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     private final String TAG = getClass().getSimpleName();
     private List<Movie> movies;
+    private OnGridItemClickedHandler onGridItemClickedHandler;
 
-    public MoviesAdapter(List<Movie> movies) {
+    public MoviesAdapter(List<Movie> movies, OnGridItemClickedHandler onGridItemClickedHandler) {
         this.movies = movies;
+        this.onGridItemClickedHandler = onGridItemClickedHandler;
     }
 
-    public MoviesAdapter() {
-        this(new ArrayList<Movie>());
+    public MoviesAdapter(OnGridItemClickedHandler onGridItemClickedHandler) {
+        this(new ArrayList<Movie>(), onGridItemClickedHandler);
     }
 
     @Override
@@ -32,6 +34,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.movie_poster_item, parent, false);
         return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
+        holder.bind(movies.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return movies.size();
     }
 
     public void swapMovies(List<Movie> movies) {
@@ -53,24 +65,21 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-    @Override
-    public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
-        holder.bind(movies.get(position));
+    interface OnGridItemClickedHandler {
+        void onItemClicked(Movie movie);
     }
 
-    @Override
-    public int getItemCount() {
-        return movies.size();
-    }
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-
+        private Movie movie;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Movie movie) {
+            this.movie = movie;
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + movie.getTitle());
             Log.d(TAG, "Loading poster with glide from url: " + movie.getPosterURL());
@@ -78,6 +87,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
                     .load(movie.getPosterURL())
                     .placeholder(R.drawable.placeholder)
                     .into(posterIv);
+        }
+
+        @Override
+        public void onClick(View v) {
+            onGridItemClickedHandler.onItemClicked(movie);
         }
     }
 }

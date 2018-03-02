@@ -23,7 +23,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.List;
 
-public class MoviesFragment extends Fragment {
+public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
     private final int GRID_COLUMN_SPAN = 2;
     private final String TAG = getClass().getSimpleName();
@@ -43,7 +43,7 @@ public class MoviesFragment extends Fragment {
 
         posterRv = view.findViewById(R.id.posters_rv);
         loadingPb = view.findViewById(R.id.fetching_data_pb);
-        moviesAdapter = new MoviesAdapter();
+        moviesAdapter = new MoviesAdapter(this);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_COLUMN_SPAN);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
@@ -90,6 +90,11 @@ public class MoviesFragment extends Fragment {
 
     private void hideProgressBar() {
         loadingPb.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onItemClicked(Movie movie) {
+        Log.d(TAG, "Selected movie: " + movie.getTitle());
     }
 
     class MovieDbQueryTask extends AsyncTask<String, Void, List<Movie>> {
