@@ -4,4 +4,5 @@
     android:id="@+id/poster_item_iv"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@drawable/movie_poster" />
+    android:adjustViewBounds="true"
+    tools:src="@drawable/placeholder" />

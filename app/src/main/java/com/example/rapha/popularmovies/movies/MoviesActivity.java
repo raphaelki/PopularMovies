@@ -3,6 +3,7 @@ package com.example.rapha.popularmovies.movies;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 
 import com.example.rapha.popularmovies.R;
 
@@ -20,5 +21,9 @@ public class MoviesActivity extends AppCompatActivity {
         fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, fragment).commit();
     }
 
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.movie_overview_menu, menu);
+        return true;
+    }
 }

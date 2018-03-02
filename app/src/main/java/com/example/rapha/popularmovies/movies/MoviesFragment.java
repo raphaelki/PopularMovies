@@ -46,10 +46,11 @@ public class MoviesFragment extends Fragment {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_COLUMN_SPAN);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
+
         posterRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (!recyclerView.canScrollVertically(1) && moviesAdapter.getItemCount() >= 20 && dy > 0) {
+                if (!recyclerView.canScrollVertically(1) && dy > 0) {
                     Log.d(TAG, "loading additional data");
                     loadData();
                 }
