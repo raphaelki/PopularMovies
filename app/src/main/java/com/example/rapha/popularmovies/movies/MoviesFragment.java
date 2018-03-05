@@ -41,6 +41,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
         posterRv = view.findViewById(R.id.posters_rv);

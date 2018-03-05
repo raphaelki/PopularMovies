@@ -25,8 +25,11 @@ public class MoviesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movies);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        moviesOverview = new MoviesFragment();
-        fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesOverview).commit();
+        moviesOverview = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
+        if (moviesOverview == null) {
+            moviesOverview = new MoviesFragment();
+            fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesOverview).commit();
+        }
     }
 
     @Override
