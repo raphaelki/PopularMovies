@@ -1,6 +1,7 @@
 package com.example.rapha.popularmovies.movies;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,7 +28,8 @@ import java.util.List;
 
 public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
-    private final int GRID_COLUMN_SPAN = 2;
+    private final int GRID_LANDSCAPE_COLUMN_SPAN = 4;
+    private final int GRID_PORTRAIT_COLUMN_SPAN = 2;
     private final String TAG = getClass().getSimpleName();
     private MoviesAdapter moviesAdapter;
     private RecyclerView posterRv;
@@ -47,7 +49,12 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         posterRv = view.findViewById(R.id.posters_rv);
         loadingPb = view.findViewById(R.id.fetching_data_pb);
         moviesAdapter = new MoviesAdapter(this);
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), GRID_COLUMN_SPAN);
+        final int orientation = getContext().getResources().getConfiguration().orientation;
+        int columnSpan = GRID_PORTRAIT_COLUMN_SPAN;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            columnSpan = GRID_LANDSCAPE_COLUMN_SPAN;
+        }
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), columnSpan);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
 
@@ -61,12 +68,11 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             }
         });
 
-        loadData();
-
         return view;
     }
 
     public void setSortOrder(String sortOrder) {
+        Log.d(TAG, "Setting sort order to: " + sortOrder);
         this.sortOrder = sortOrder;
         moviesAdapter.clearMovieList();
         resetCurrentPage();
@@ -79,7 +85,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
 
     private void incrementCurrentPage() {
         currentPage++;
-        Log.d(TAG, "current page is set to " + currentPage);
+        Log.d(TAG, "Current page is set incremented to " + currentPage);
     }
 
     private void loadData() {

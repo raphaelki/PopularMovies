@@ -40,10 +40,4 @@ public class MovieDetailsActivity extends AppCompatActivity {
         inflater.inflate(R.menu.detail_menu, menu);
         return true;
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
 }
