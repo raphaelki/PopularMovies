@@ -1,5 +1,6 @@
 package com.example.rapha.popularmovies.movies;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +16,7 @@ import android.widget.ProgressBar;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
+import com.example.rapha.popularmovies.details.MovieDetailsActivity;
 import com.example.rapha.popularmovies.utils.MovieDbJsonUtils;
 import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 
@@ -95,6 +97,9 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     @Override
     public void onItemClicked(Movie movie) {
         Log.d(TAG, "Selected movie: " + movie.getTitle());
+        Intent intent = new Intent(getContext(), MovieDetailsActivity.class);
+        intent.putExtra("movie", movie);
+        startActivity(intent);
     }
 
     class MovieDbQueryTask extends AsyncTask<String, Void, List<Movie>> {

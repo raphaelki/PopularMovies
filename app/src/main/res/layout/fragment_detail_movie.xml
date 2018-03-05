@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/detail_original_title_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/detail_original_title_label"
+            app:layout_constraintLeft_toRightOf="@id/detaill_poster_iv"
+            app:layout_constraintTop_toTopOf="@id/detaill_poster_iv" />
+
+        <TextView
+            android:id="@+id/detail_original_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/detail_original_title_label"
+            app:layout_constraintTop_toBottomOf="@id/detail_original_title_label"
+            tools:text="Zootopia" />
+
+        <ImageView
+            android:id="@+id/detaill_poster_iv"
+            android:layout_width="140dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="25dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/detail_poster_content_description"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/zootopia" />
+
+        <TextView
+            android:id="@+id/detail_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toLeftOf="@id/detail_original_title"
+            app:layout_constraintTop_toBottomOf="@id/detail_original_title"
+            tools:text="2016-02-11" />
+
+        <TextView
+            android:id="@+id/detail_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@+id/detail_year"
+            app:layout_constraintTop_toBottomOf="@id/detail_year"
+            tools:text="120 min" />
+
+        <TextView
+            android:id="@+id/detail_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="@id/detail_year"
+            app:layout_constraintTop_toBottomOf="@id/detail_duration"
+            tools:layout_editor_absoluteX="165dp"
+            tools:text="7.7/10" />
+
+        <TextView
+            android:id="@+id/detail_plot"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="@id/detaill_poster_iv"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/detaill_poster_iv"
+            tools:text="Determined to prove herself, Officer Judy Hopps, the first bunny on Zootopia's police force, jumps at the chance to crack her first case - even if it means partnering with scam-artist fox Nick Wilde to solve the mystery." />
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>

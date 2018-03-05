@@ -1,7 +1,21 @@
 package com.example.rapha.popularmovies.data;
 
-public class Movie {
+import android.os.Parcel;
+import android.os.Parcelable;
 
+public class Movie implements Parcelable {
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
     private String title;
     private String posterURL;
     private String originalTitle;
@@ -14,9 +28,17 @@ public class Movie {
         this.posterURL = posterURL;
         this.originalTitle = originalTitle;
         this.plot = plot;
-
         this.releaseDate = releaseDate;
         this.userRating = userRating;
+    }
+
+    private Movie(Parcel in) {
+        title = in.readString();
+        posterURL = in.readString();
+        originalTitle = in.readString();
+        plot = in.readString();
+        releaseDate = in.readString();
+        userRating = in.readString();
     }
 
     public String getTitle() {
@@ -41,5 +63,20 @@ public class Movie {
 
     public String getUserRating() {
         return userRating;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(posterURL);
+        dest.writeString(originalTitle);
+        dest.writeString(plot);
+        dest.writeString(releaseDate);
+        dest.writeString(userRating);
     }
 }
