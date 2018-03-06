@@ -7,13 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
@@ -32,8 +33,9 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     private final int GRID_PORTRAIT_COLUMN_SPAN = 2;
     private final String TAG = getClass().getSimpleName();
     private MoviesAdapter moviesAdapter;
+    private TextView noConnectionTv;
     private RecyclerView posterRv;
-    private ProgressBar loadingPb;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private int currentPage = 1;
     private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
 
@@ -47,17 +49,27 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
         posterRv = view.findViewById(R.id.posters_rv);
-        loadingPb = view.findViewById(R.id.fetching_data_pb);
+        noConnectionTv = view.findViewById(R.id.no_connection_tv);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d(TAG, "Refreshing data");
+                resetCurrentPage();
+                loadData();
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         moviesAdapter = new MoviesAdapter(this);
         final int orientation = getContext().getResources().getConfiguration().orientation;
         int columnSpan = GRID_PORTRAIT_COLUMN_SPAN;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             columnSpan = GRID_LANDSCAPE_COLUMN_SPAN;
         }
+
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), columnSpan);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
-
         posterRv.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -85,7 +97,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
 
     private void incrementCurrentPage() {
         currentPage++;
-        Log.d(TAG, "Current page is set incremented to " + currentPage);
+        Log.d(TAG, "Current page is incremented to " + currentPage);
     }
 
     private void loadData() {
@@ -93,12 +105,17 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         new MovieDbQueryTask().execute(apiKey, String.valueOf(currentPage), sortOrder);
     }
 
-    private void showProgressBar() {
-        loadingPb.setVisibility(View.VISIBLE);
+    private void showProgress() {
+        swipeRefreshLayout.setRefreshing(true);
+        noConnectionTv.setVisibility(View.GONE);
     }
 
-    private void hideProgressBar() {
-        loadingPb.setVisibility(View.GONE);
+    private void hideProgress() {
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void showNoConnectionMessage() {
+        noConnectionTv.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -113,13 +130,17 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
-            if (currentPage == 1) {
-                moviesAdapter.swapMovies(movies);
+            if (movies == null) {
+                showNoConnectionMessage();
             } else {
-                moviesAdapter.appendMovieList(movies);
+                if (currentPage == 1) {
+                    moviesAdapter.swapMovies(movies);
+                } else {
+                    moviesAdapter.appendMovieList(movies);
+                }
+                incrementCurrentPage();
             }
-            hideProgressBar();
-            incrementCurrentPage();
+            hideProgress();
         }
 
         @Override
@@ -142,7 +163,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
 
         @Override
         protected void onPreExecute() {
-            showProgressBar();
+            showProgress();
         }
     }
 }

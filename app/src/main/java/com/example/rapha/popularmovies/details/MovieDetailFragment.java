@@ -56,7 +56,7 @@ public class MovieDetailFragment extends Fragment {
     private void populateView(Movie movie) {
         originalTitleTv.setText(movie.getOriginalTitle());
         yearTv.setText(movie.getReleaseDate());
-        ratingTv.setText(movie.getUserRating());
+        ratingTv.setText(getString(R.string.detail_rating, movie.getUserRating()));
         plotTv.setText(movie.getPlot());
         GlideApp.with(context).load(movie.getPosterURL()).placeholder(R.drawable.placeholder).into(posterIv);
     }
