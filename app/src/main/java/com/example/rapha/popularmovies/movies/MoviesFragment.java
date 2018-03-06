@@ -149,7 +149,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             String pageToLoad = strings[1];
             String sortOrder = strings[2];
             try {
-                String jsonData = MovieDbNetworkUtils.fetchMovies(apiKey, pageToLoad, sortOrder);
+                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, pageToLoad, sortOrder);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {

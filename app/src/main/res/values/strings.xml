@@ -9,7 +9,10 @@
     <string name="menu_top_rated">Highest rated</string>
 
     <string name="detail_rating">%1$s/10</string>
+
     <string name="detail_original_title_label">Original title:</string>
     <string name="detail_favorite">Favorite</string>
     <string name="detail_poster_content_description">Picture showing poster of the movie</string>
+
+    <string name="query_localization">en-US</string>
 </resources>

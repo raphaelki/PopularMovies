@@ -16,6 +16,11 @@ import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.utils.GlideApp;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MovieDetailFragment extends Fragment {
 
     private final String TAG = getClass().getSimpleName();
@@ -55,7 +60,15 @@ public class MovieDetailFragment extends Fragment {
 
     private void populateView(Movie movie) {
         originalTitleTv.setText(movie.getOriginalTitle());
-        yearTv.setText(movie.getReleaseDate());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateShown = movie.getReleaseDate();
+        try {
+            Date date = simpleDateFormat.parse(movie.getReleaseDate());
+            dateShown = DateFormat.getDateInstance(DateFormat.LONG, getResources().getConfiguration().locale).format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        yearTv.setText(dateShown);
         ratingTv.setText(getString(R.string.detail_rating, movie.getUserRating()));
         plotTv.setText(movie.getPlot());
         GlideApp.with(context).load(movie.getPosterURL()).placeholder(R.drawable.placeholder).into(posterIv);

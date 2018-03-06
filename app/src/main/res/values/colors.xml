@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#2E7D32</color>
     <color name="colorAccent">#69F0AE</color>
     <color name="poster_background_color">#000000</color>
+    <color name="rating_star_color">#e4bb26</color>
 </resources>

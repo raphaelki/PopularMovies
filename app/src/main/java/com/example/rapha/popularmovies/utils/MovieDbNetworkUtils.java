@@ -1,7 +1,10 @@
 package com.example.rapha.popularmovies.utils;
 
+import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
+import com.example.rapha.popularmovies.R;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -18,9 +21,10 @@ public class MovieDbNetworkUtils {
     private final static String MOVIE_DB_BASE_URL = "https://api.themoviedb.org/3/movie";
     private final static String PAGE_PARA = "page";
     private final static String API_KEY_PARA = "api_key";
+    private final static String LANGUAGE = "language";
 
-    public static String fetchMovies(String apiKey, String page, String sortOrder) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(sortOrder, apiKey, page).openConnection();
+    public static String fetchMovies(Context context, String apiKey, String page, String sortOrder) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) buildQueryURL(context, sortOrder, apiKey, page).openConnection();
         try {
             BufferedInputStream stream = new BufferedInputStream(connection.getInputStream());
             Scanner scanner = new Scanner(stream);
@@ -37,11 +41,12 @@ public class MovieDbNetworkUtils {
         }
     }
 
-    private static URL buildQueryURL(String sortOrder, String apiKey, String page) {
+    private static URL buildQueryURL(Context context, String sortOrder, String apiKey, String page) {
         Uri uri = Uri.parse(MOVIE_DB_BASE_URL);
         uri = uri.buildUpon()
                 .appendEncodedPath(sortOrder)
                 .appendQueryParameter(API_KEY_PARA, apiKey)
+                .appendQueryParameter(LANGUAGE, context.getResources().getString(R.string.query_localization))
                 .appendQueryParameter(PAGE_PARA, page)
                 .build();
         URL url = null;
