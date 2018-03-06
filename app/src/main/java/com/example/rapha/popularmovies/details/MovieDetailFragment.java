@@ -25,7 +25,7 @@ public class MovieDetailFragment extends Fragment {
 
     private final String TAG = getClass().getSimpleName();
 
-    private TextView durationTv;
+    private TextView titleTv;
     private TextView originalTitleTv;
     private ImageView posterIv;
     private TextView yearTv;
@@ -42,7 +42,7 @@ public class MovieDetailFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_detail_movie, container, false);
 
-        durationTv = view.findViewById(R.id.detail_duration);
+        titleTv = view.findViewById(R.id.detail_title);
         originalTitleTv = view.findViewById(R.id.detail_original_title);
         plotTv = view.findViewById(R.id.detail_plot);
         ratingTv = view.findViewById(R.id.detail_rating);
@@ -59,12 +59,13 @@ public class MovieDetailFragment extends Fragment {
     }
 
     private void populateView(Movie movie) {
+        titleTv.setText(movie.getTitle());
         originalTitleTv.setText(movie.getOriginalTitle());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateShown = movie.getReleaseDate();
         try {
             Date date = simpleDateFormat.parse(movie.getReleaseDate());
-            dateShown = DateFormat.getDateInstance(DateFormat.LONG, getResources().getConfiguration().locale).format(date);
+            dateShown = DateFormat.getDateInstance(DateFormat.SHORT, getResources().getConfiguration().locale).format(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
