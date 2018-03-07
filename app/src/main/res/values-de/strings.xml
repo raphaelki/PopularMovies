@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="content_description">Poster des Films </string>
+
+    <string name="main_no_connection">Keine Datenverbindung verfügbar</string>
+
+    <string name="menu_sort_order">Sortieren nach</string>
+    <string name="menu_popular">Derzeit beliebt</string>
+    <string name="menu_top_rated">Höchste Wertung</string>
+
+    <string name="detail_original_title_label">Originaltitel:</string>
+    <string name="detail_favorite">Favorit</string>
+    <string name="detail_poster_content_description">Das Bild zeigt ein Poster des Films</string>
+
     <string name="query_localization">de-DE</string>
+
+    <string name="add_to_favorites_toast">Hinzufügen zu Favoriten ist noch nicht implementiert</string>
 </resources>
