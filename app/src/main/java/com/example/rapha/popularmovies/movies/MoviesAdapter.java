@@ -46,8 +46,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         return movies.size();
     }
 
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
     public void swapMovies(List<Movie> movies) {
         if (movies != null) {
+            Log.d(TAG, "Replacing movie list. New list contains " + movies.size() + " items");
             this.movies = movies;
             notifyDataSetChanged();
         }
@@ -56,6 +61,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     public void appendMovieList(List<Movie> movies) {
         if (movies != null) {
             this.movies.addAll(movies);
+            Log.d(TAG, "Appending movie list. New size: " + this.movies.size());
             notifyDataSetChanged();
         }
     }
@@ -82,7 +88,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             this.movie = movie;
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + movie.getTitle());
-            Log.d(TAG, "Loading poster with glide from url: " + movie.getPosterURL());
             GlideApp.with(itemView.getContext())
                     .load(movie.getPosterURL())
                     .placeholder(R.drawable.placeholder)

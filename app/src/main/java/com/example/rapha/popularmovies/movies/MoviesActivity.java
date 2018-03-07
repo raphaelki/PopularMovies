@@ -16,7 +16,10 @@ import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 public class MoviesActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
-    private MoviesFragment moviesOverview;
+    private final String SPINNER_POSITION_KEY = "spinner_position";
+    private MoviesFragment moviesFragment;
+    private boolean isUserInteracting;
+    private int spinnerPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +27,16 @@ public class MoviesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 
+        if (savedInstanceState != null) {
+            spinnerPosition = savedInstanceState.getInt(SPINNER_POSITION_KEY);
+            Log.d(TAG, "Restoring spinner position to " + spinnerPosition);
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
-        moviesOverview = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
-        if (moviesOverview == null) {
-            moviesOverview = new MoviesFragment();
-            fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesOverview).commit();
+        moviesFragment = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
+        if (moviesFragment == null) {
+            moviesFragment = new MoviesFragment();
+            fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesFragment).commit();
         }
     }
 
@@ -37,19 +45,24 @@ public class MoviesActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.movie_overview_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.sort_order_spinner);
         Spinner spinner = (Spinner) menuItem.getActionView();
+        spinner.setSelection(spinnerPosition);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String item = (String) parent.getItemAtPosition(position);
-                Log.d(TAG, "Sort order selected: " + item);
-                String popularSortOrder = getString(R.string.menu_popular);
-                String topRatedSortOrder = getString(R.string.menu_top_rated);
-                if (item.equals(popularSortOrder)) {
-                    moviesOverview.setSortOrder(MovieDbNetworkUtils.POPULAR_PATH);
-                } else if (item.equals(topRatedSortOrder)) {
-                    moviesOverview.setSortOrder(MovieDbNetworkUtils.TOP_RATED_PATH);
-                } else {
-                    throw new RuntimeException("Sort order not implemented: " + item);
+                if (isUserInteracting) {
+                    spinnerPosition = position;
+                    Log.d(TAG, "Sort order selected: " + item);
+                    String popularSortOrder = getString(R.string.menu_popular);
+                    String topRatedSortOrder = getString(R.string.menu_top_rated);
+                    if (item.equals(popularSortOrder)) {
+                        moviesFragment.setSortOrder(MovieDbNetworkUtils.POPULAR_PATH);
+                    } else if (item.equals(topRatedSortOrder)) {
+                        moviesFragment.setSortOrder(MovieDbNetworkUtils.TOP_RATED_PATH);
+                    } else {
+                        throw new RuntimeException("Sort order not implemented: " + item);
+                    }
+                    isUserInteracting = false;
                 }
             }
 
@@ -58,5 +71,17 @@ public class MoviesActivity extends AppCompatActivity {
             }
         });
         return true;
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        isUserInteracting = true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SPINNER_POSITION_KEY, spinnerPosition);
     }
 }

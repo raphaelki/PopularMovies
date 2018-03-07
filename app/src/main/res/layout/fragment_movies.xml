@@ -23,7 +23,8 @@
             android:gravity="center_horizontal"
             android:paddingTop="30dp"
             android:text="@string/main_no_connection"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:visibility="gone" />
 
     </FrameLayout>
 

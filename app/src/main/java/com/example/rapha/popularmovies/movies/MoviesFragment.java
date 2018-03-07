@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
@@ -25,17 +27,24 @@ import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
     private final String TAG = getClass().getSimpleName();
 
+    private final String SORT_ORDER_KEY = "sort_order";
+    private final String PAGE_TO_LOAD_KEY = "page_to_load";
+    private final String RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
+    private final String MOVIES_KEY = "movies";
+    private final String NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
+
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private int currentPage = 1;
+    private int pageToLoad = 1;
     private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
     private String apiKey;
 
@@ -76,13 +85,28 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (!recyclerView.canScrollVertically(1) && dy > 0) {
-                    Log.d(TAG, "Loading additional data");
                     loadData();
                 }
             }
         });
 
+        if (savedInstanceState == null) {
+            loadData();
+        } else {
+            restoreViewState(savedInstanceState);
+        }
+
         return view;
+    }
+
+    private void restoreViewState(Bundle savedInstanceState) {
+        pageToLoad = savedInstanceState.getInt(PAGE_TO_LOAD_KEY);
+        sortOrder = savedInstanceState.getString(SORT_ORDER_KEY);
+        List<Movie> movies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+        moviesAdapter.swapMovies(movies);
+        Parcelable rvState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE_KEY);
+        posterRv.getLayoutManager().onRestoreInstanceState(rvState);
+        noConnectionTv.setVisibility(savedInstanceState.getInt(NO_CONNECTION_VISIBILITY_KEY));
     }
 
     public void setSortOrder(String sortOrder) {
@@ -94,16 +118,16 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     private void resetCurrentPage() {
-        currentPage = 1;
+        pageToLoad = 1;
     }
 
     private void incrementCurrentPage() {
-        currentPage++;
-        Log.d(TAG, "Current page is incremented to " + currentPage);
+        pageToLoad++;
     }
 
     private void loadData() {
         new MovieDbQueryTask().execute();
+        Log.d(TAG, "Loading movies page " + pageToLoad);
     }
 
     private void showProgress() {
@@ -116,7 +140,11 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     private void showNoConnectionMessage() {
-        noConnectionTv.setVisibility(View.VISIBLE);
+        if (moviesAdapter.getItemCount() > 0) {
+            Toast.makeText(getContext(), getString(R.string.main_no_connection), Toast.LENGTH_LONG).show();
+        } else {
+            noConnectionTv.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -127,6 +155,17 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         startActivity(intent);
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(PAGE_TO_LOAD_KEY, pageToLoad);
+        outState.putString(SORT_ORDER_KEY, sortOrder);
+        Parcelable rvState = posterRv.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(RECYCLER_VIEW_STATE_KEY, rvState);
+        outState.putParcelableArrayList(MOVIES_KEY, (ArrayList<? extends Parcelable>) moviesAdapter.getMovies());
+        outState.putInt(NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
+    }
+
     class MovieDbQueryTask extends AsyncTask<Void, Void, List<Movie>> {
 
         @Override
@@ -134,7 +173,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             if (movies == null) {
                 showNoConnectionMessage();
             } else {
-                if (currentPage == 1) {
+                if (pageToLoad == 1) {
                     moviesAdapter.swapMovies(movies);
                 } else {
                     moviesAdapter.appendMovieList(movies);
@@ -147,7 +186,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         @Override
         protected List<Movie> doInBackground(Void... voids) {
             try {
-                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, String.valueOf(currentPage), sortOrder);
+                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, String.valueOf(pageToLoad), sortOrder);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {
