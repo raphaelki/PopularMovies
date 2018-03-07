@@ -29,15 +29,15 @@ import java.util.List;
 
 public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
-    private final int GRID_LANDSCAPE_COLUMN_SPAN = 4;
-    private final int GRID_PORTRAIT_COLUMN_SPAN = 2;
     private final String TAG = getClass().getSimpleName();
+
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int currentPage = 1;
     private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
+    private String apiKey;
 
     public MoviesFragment() {
     }
@@ -48,9 +48,12 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
-        posterRv = view.findViewById(R.id.posters_rv);
         noConnectionTv = view.findViewById(R.id.no_connection_tv);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        posterRv = view.findViewById(R.id.posters_rv);
+
+        apiKey = getString(R.string.api_key);
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -60,13 +63,12 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+
         moviesAdapter = new MoviesAdapter(this);
         final int orientation = getContext().getResources().getConfiguration().orientation;
-        int columnSpan = GRID_PORTRAIT_COLUMN_SPAN;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            columnSpan = GRID_LANDSCAPE_COLUMN_SPAN;
-        }
-
+        int columnSpan = orientation == Configuration.ORIENTATION_PORTRAIT
+                ? getResources().getInteger(R.integer.gridview_portrait_columns)
+                : getResources().getInteger(R.integer.gridview_landscape_columns);
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), columnSpan);
         posterRv.setLayoutManager(layoutManager);
         posterRv.setAdapter(moviesAdapter);
@@ -101,8 +103,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     private void loadData() {
-        String apiKey = getString(R.string.api_key);
-        new MovieDbQueryTask().execute(apiKey, String.valueOf(currentPage), sortOrder);
+        new MovieDbQueryTask().execute();
     }
 
     private void showProgress() {
@@ -122,11 +123,11 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     public void onItemClicked(Movie movie) {
         Log.d(TAG, "Selected movie: " + movie.getTitle());
         Intent intent = new Intent(getContext(), MovieDetailsActivity.class);
-        intent.putExtra("movie", movie);
+        intent.putExtra(getString(R.string.movie_parcelable_key), movie);
         startActivity(intent);
     }
 
-    class MovieDbQueryTask extends AsyncTask<String, Void, List<Movie>> {
+    class MovieDbQueryTask extends AsyncTask<Void, Void, List<Movie>> {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
@@ -144,12 +145,9 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         }
 
         @Override
-        protected List<Movie> doInBackground(String... strings) {
-            String apiKey = strings[0];
-            String pageToLoad = strings[1];
-            String sortOrder = strings[2];
+        protected List<Movie> doInBackground(Void... voids) {
             try {
-                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, pageToLoad, sortOrder);
+                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, String.valueOf(currentPage), sortOrder);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {

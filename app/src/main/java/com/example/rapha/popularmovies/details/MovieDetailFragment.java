@@ -1,6 +1,5 @@
 package com.example.rapha.popularmovies.details;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,7 +30,6 @@ public class MovieDetailFragment extends Fragment {
     private TextView yearTv;
     private TextView ratingTv;
     private TextView plotTv;
-    private Context context;
 
     public MovieDetailFragment() {
     }
@@ -49,29 +47,32 @@ public class MovieDetailFragment extends Fragment {
         yearTv = view.findViewById(R.id.detail_year);
         posterIv = view.findViewById(R.id.detaill_poster_iv);
 
-        context = view.getContext();
-
-        Movie movie = getArguments().getParcelable("movie");
+        Movie movie = getArguments().getParcelable(getString(R.string.movie_parcelable_key));
         if (movie != null) {
             populateView(movie);
         }
         return view;
     }
 
-    private void populateView(Movie movie) {
-        titleTv.setText(movie.getTitle());
-        originalTitleTv.setText(movie.getOriginalTitle());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dateShown = movie.getReleaseDate();
+    private String convertTmdbDateToLocalDateFormat(String tmdbDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.tmdb_date_pattern));
+        String dateShown;
         try {
-            Date date = simpleDateFormat.parse(movie.getReleaseDate());
+            Date date = simpleDateFormat.parse(tmdbDate);
             dateShown = DateFormat.getDateInstance(DateFormat.SHORT, getResources().getConfiguration().locale).format(date);
         } catch (ParseException e) {
             e.printStackTrace();
+            dateShown = tmdbDate;
         }
-        yearTv.setText(dateShown);
+        return dateShown;
+    }
+
+    private void populateView(Movie movie) {
+        titleTv.setText(movie.getTitle());
+        originalTitleTv.setText(movie.getOriginalTitle());
+        yearTv.setText(convertTmdbDateToLocalDateFormat(movie.getReleaseDate()));
         ratingTv.setText(getString(R.string.detail_rating, movie.getUserRating()));
         plotTv.setText(movie.getPlot());
-        GlideApp.with(context).load(movie.getPosterURL()).placeholder(R.drawable.placeholder).into(posterIv);
+        GlideApp.with(getContext()).load(movie.getPosterURL()).placeholder(R.drawable.placeholder).into(posterIv);
     }
 }

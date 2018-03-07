@@ -14,7 +14,9 @@
     <string name="detail_favorite">Favorite</string>
     <string name="detail_poster_content_description">Picture showing poster of the movie</string>
 
-    <string name="query_localization">en-US</string>
-
     <string name="add_to_favorites_toast">Add to user favorites is not implemented yet</string>
+
+    <string name="query_localization">en-US</string>
+    <string name="tmdb_date_pattern" translatable="false">yyyy-MM-dd</string>
+    <string name="movie_parcelable_key" translatable="false">movie</string>
 </resources>

@@ -29,9 +29,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         if (movieDetailFragment == null) {
             movieDetailFragment = new MovieDetailFragment();
             fragmentManager.beginTransaction().add(R.id.detail_fragment_frame, movieDetailFragment).commit();
-            Movie movie = getIntent().getParcelableExtra("movie");
+            Movie movie = getIntent().getParcelableExtra(getString(R.string.movie_parcelable_key));
             Bundle bundle = new Bundle();
-            bundle.putParcelable("movie", movie);
+            bundle.putParcelable(getString(R.string.movie_parcelable_key), movie);
             movieDetailFragment.setArguments(bundle);
         }
     }
