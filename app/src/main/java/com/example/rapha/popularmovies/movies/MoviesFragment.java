@@ -2,7 +2,6 @@ package com.example.rapha.popularmovies.movies;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -22,12 +21,9 @@ import com.example.rapha.popularmovies.BuildConfig;
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.details.MovieDetailsActivity;
-import com.example.rapha.popularmovies.utils.MovieDbJsonUtils;
+import com.example.rapha.popularmovies.listener.AsyncTaskListener;
 import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +119,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     private void loadData() {
-        new MovieDbQueryTask().execute();
+        new FetchMoviesFromTmdbTask(getContext(), new FetchMoviesListener()).execute(String.valueOf(pageToLoad), sortOrder);
         Log.d(TAG, "Loading movies page " + pageToLoad);
     }
 
@@ -163,10 +159,10 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         outState.putInt(NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
     }
 
-    class MovieDbQueryTask extends AsyncTask<Void, Void, List<Movie>> {
+    class FetchMoviesListener implements AsyncTaskListener<List<Movie>> {
 
         @Override
-        protected void onPostExecute(List<Movie> movies) {
+        public void onCompletion(List<Movie> movies) {
             if (movies == null) {
                 showNoConnectionMessage();
             } else {
@@ -178,26 +174,6 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
                 incrementCurrentPage();
             }
             hideProgress();
-        }
-
-        @Override
-        protected List<Movie> doInBackground(Void... voids) {
-            try {
-                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), API_KEY, String.valueOf(pageToLoad), sortOrder);
-                try {
-                    return MovieDbJsonUtils.parseMovieDbJson(jsonData);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            showProgress();
         }
     }
 }
