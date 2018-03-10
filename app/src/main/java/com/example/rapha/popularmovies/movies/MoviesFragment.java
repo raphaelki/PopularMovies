@@ -1,7 +1,10 @@
 package com.example.rapha.popularmovies.movies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -119,8 +122,15 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     private void loadData() {
-        new FetchMoviesFromTmdbTask(getContext(), new FetchMoviesListener()).execute(String.valueOf(pageToLoad), sortOrder);
-        Log.d(TAG, "Loading movies page " + pageToLoad);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
+            showProgress();
+            new FetchMoviesFromTmdbTask(getContext(), new FetchMoviesListener()).execute(String.valueOf(pageToLoad), sortOrder);
+            Log.d(TAG, "Loading movies page " + pageToLoad);
+        } else {
+            showNoConnectionMessage();
+        }
     }
 
     private void showProgress() {
@@ -138,6 +148,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         } else {
             noConnectionTv.setVisibility(View.VISIBLE);
         }
+        hideProgress();
     }
 
     @Override
