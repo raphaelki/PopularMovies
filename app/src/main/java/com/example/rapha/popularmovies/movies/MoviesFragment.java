@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.rapha.popularmovies.BuildConfig;
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.details.MovieDetailsActivity;
@@ -32,21 +33,19 @@ import java.util.List;
 
 public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
+    private final static String API_KEY = BuildConfig.TMDB_API_KEY;
     private final String TAG = getClass().getSimpleName();
-
     private final String SORT_ORDER_KEY = "sort_order";
     private final String PAGE_TO_LOAD_KEY = "page_to_load";
     private final String RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
     private final String MOVIES_KEY = "movies";
     private final String NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
-
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int pageToLoad = 1;
     private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
-    private String apiKey;
 
     public MoviesFragment() {
     }
@@ -60,8 +59,6 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         noConnectionTv = view.findViewById(R.id.no_connection_tv);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
         posterRv = view.findViewById(R.id.posters_rv);
-
-        apiKey = getString(R.string.api_key);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -186,7 +183,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         @Override
         protected List<Movie> doInBackground(Void... voids) {
             try {
-                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), apiKey, String.valueOf(pageToLoad), sortOrder);
+                String jsonData = MovieDbNetworkUtils.fetchMovies(getContext(), API_KEY, String.valueOf(pageToLoad), sortOrder);
                 try {
                     return MovieDbJsonUtils.parseMovieDbJson(jsonData);
                 } catch (JSONException e) {
