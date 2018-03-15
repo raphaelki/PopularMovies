@@ -8,7 +8,7 @@
     <string name="menu_popular">Most popular</string>
     <string name="menu_top_rated">Highest rated</string>
 
-    <string name="detail_rating" translatable="false">%1$s/10</string>
+    <string name="detail_rating">%1$s/10</string>
 
     <string name="detail_original_title_label">Original title:</string>
     <string name="detail_favorite">Favorite</string>
@@ -17,6 +17,7 @@
     <string name="add_to_favorites_toast">Add to user favorites is not implemented yet</string>
 
     <string name="query_localization">en-US</string>
-    <string name="tmdb_date_pattern" translatable="false">yyyy-MM-dd</string>
     <string name="movie_parcelable_key" translatable="false">movie</string>
+
+    <string name="tmdb_base_url" translatable="false">https://api.themoviedb.org/3/movie/</string>
 </resources>

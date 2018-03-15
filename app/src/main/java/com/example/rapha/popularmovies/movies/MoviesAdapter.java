@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.utils.GlideApp;
+import com.example.rapha.popularmovies.utils.TmdbUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +90,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + movie.getTitle());
             GlideApp.with(itemView.getContext())
-                    .load(movie.getPosterURL())
+                    .load(TmdbUtils.getFullImageURL(movie.getPosterPath()))
                     .placeholder(R.drawable.placeholder)
                     .into(posterIv);
         }

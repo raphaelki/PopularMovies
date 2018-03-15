@@ -11,7 +11,6 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 
 public class MoviesActivity extends AppCompatActivity {
 
@@ -56,9 +55,9 @@ public class MoviesActivity extends AppCompatActivity {
                     String popularSortOrder = getString(R.string.menu_popular);
                     String topRatedSortOrder = getString(R.string.menu_top_rated);
                     if (item.equals(popularSortOrder)) {
-                        moviesFragment.setSortOrder(MovieDbNetworkUtils.POPULAR_PATH);
+                        moviesFragment.setSortOrder(MoviesFragment.POPULAR_PATH);
                     } else if (item.equals(topRatedSortOrder)) {
-                        moviesFragment.setSortOrder(MovieDbNetworkUtils.TOP_RATED_PATH);
+                        moviesFragment.setSortOrder(MoviesFragment.TOP_RATED_PATH);
                     } else {
                         throw new RuntimeException("Sort order not implemented: " + item);
                     }

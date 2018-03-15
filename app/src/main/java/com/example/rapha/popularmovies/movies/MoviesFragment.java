@@ -20,19 +20,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.rapha.popularmovies.BuildConfig;
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.details.MovieDetailsActivity;
 import com.example.rapha.popularmovies.listener.AsyncTaskListener;
-import com.example.rapha.popularmovies.utils.MovieDbNetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
 
-    private final static String API_KEY = BuildConfig.TMDB_API_KEY;
+    public final static String POPULAR_PATH = "popular";
+    public final static String TOP_RATED_PATH = "top_rated";
     private final String TAG = getClass().getSimpleName();
     private final String SORT_ORDER_KEY = "sort_order";
     private final String PAGE_TO_LOAD_KEY = "page_to_load";
@@ -44,7 +43,7 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int pageToLoad = 1;
-    private String sortOrder = MovieDbNetworkUtils.POPULAR_PATH;
+    private String sortOrder = POPULAR_PATH;
 
     public MoviesFragment() {
     }

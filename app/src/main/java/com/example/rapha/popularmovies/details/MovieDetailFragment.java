@@ -14,11 +14,7 @@ import android.widget.TextView;
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.Movie;
 import com.example.rapha.popularmovies.utils.GlideApp;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.example.rapha.popularmovies.utils.TmdbUtils;
 
 public class MovieDetailFragment extends Fragment {
 
@@ -54,25 +50,14 @@ public class MovieDetailFragment extends Fragment {
         return view;
     }
 
-    private String convertTmdbDateToLocalDateFormat(String tmdbDate) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(getString(R.string.tmdb_date_pattern));
-        String dateShown;
-        try {
-            Date date = simpleDateFormat.parse(tmdbDate);
-            dateShown = DateFormat.getDateInstance(DateFormat.SHORT, getResources().getConfiguration().locale).format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            dateShown = tmdbDate;
-        }
-        return dateShown;
-    }
 
     private void populateView(Movie movie) {
         titleTv.setText(movie.getTitle());
         originalTitleTv.setText(movie.getOriginalTitle());
-        yearTv.setText(convertTmdbDateToLocalDateFormat(movie.getReleaseDate()));
-        ratingTv.setText(getString(R.string.detail_rating, movie.getUserRating()));
-        plotTv.setText(movie.getPlot());
-        GlideApp.with(getContext()).load(movie.getPosterURL()).placeholder(R.drawable.placeholder).into(posterIv);
+        yearTv.setText(TmdbUtils.convertTmdbDateToLocalDateFormat(getContext(), movie.getReleaseDate()));
+        ratingTv.setText(getString(R.string.detail_rating, String.valueOf(movie.getVoteAverage())));
+        plotTv.setText(movie.getOverview());
+        String fullPosterPath = TmdbUtils.getFullImageURL(movie.getPosterPath());
+        GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
     }
 }

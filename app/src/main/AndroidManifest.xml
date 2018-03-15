@@ -23,6 +23,11 @@
         <activity
             android:name=".details.MovieDetailsActivity"
             android:parentActivityName=".movies.MoviesActivity" />
+
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="com.example.rapha.popularmovies"
+            android:exported="false" />
     </application>
 
 </manifest>
