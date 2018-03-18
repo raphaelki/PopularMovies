@@ -38,27 +38,16 @@
             tools:text="Zootopia" />
 
         <TextView
-            android:id="@+id/detail_original_title_label"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/detail_vertical_margin"
-            android:text="@string/detail_original_title_label"
-            android:textSize="@dimen/detail_normal_text_size"
-            app:layout_constraintLeft_toLeftOf="@id/detail_title"
-            app:layout_constraintLeft_toRightOf="@id/detaill_poster_iv"
-            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
-            app:layout_constraintTop_toBottomOf="@id/detail_title" />
-
-        <TextView
             android:id="@+id/detail_original_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/detail_vertical_margin"
             android:layout_marginRight="@dimen/detail_vertical_margin"
             android:textSize="@dimen/detail_normal_text_size"
-            app:layout_constraintLeft_toLeftOf="@id/detail_original_title_label"
+            android:textStyle="italic"
+            app:layout_constraintLeft_toLeftOf="@id/detail_title"
             app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
-            app:layout_constraintTop_toBottomOf="@id/detail_original_title_label"
+            app:layout_constraintTop_toBottomOf="@id/detail_title"
             tools:text="Zootopia" />
 
         <ImageView

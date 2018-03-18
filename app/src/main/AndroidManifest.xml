@@ -28,6 +28,10 @@
             android:name=".data.MovieProvider"
             android:authorities="com.example.rapha.popularmovies"
             android:exported="false" />
+
+        <service
+            android:name=".services.TmdbFetchIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

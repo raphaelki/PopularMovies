@@ -1,4 +1,4 @@
-package com.example.rapha.popularmovies.data;
+package com.example.rapha.popularmovies.data.models;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -8,9 +8,8 @@ public class MovieList {
 
     @SerializedName("page")
     private Integer page = 0;
-
     @SerializedName("results")
-    private List<Movie> movies = null;
+    private List<Movie> movies;
 
     public Integer getPage() {
         return page;

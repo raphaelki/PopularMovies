@@ -3,6 +3,7 @@ package com.example.rapha.popularmovies.movies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -10,6 +11,9 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,18 +25,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.Movie;
+import com.example.rapha.popularmovies.data.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.details.MovieDetailsActivity;
-import com.example.rapha.popularmovies.listener.AsyncTaskListener;
+import com.example.rapha.popularmovies.services.TmdbFetchIntentService;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItemClickedHandler {
+public class MoviesFragment extends Fragment implements
+        MoviesAdapter.OnGridItemClickedHandler,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     public final static String POPULAR_PATH = "popular";
     public final static String TOP_RATED_PATH = "top_rated";
+    public static final String[] MAIN_MOVIE_PROJECTION = {
+            MoviesDatabaseContract.MovieEntry._ID,
+            MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
+            MoviesDatabaseContract.MovieEntry.COLUMN_TITLE
+    };
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_MOVIE_POSTER_PATH = 1;
+    public static final int INDEX_MOVIE_TITLE = 2;
     private final String TAG = getClass().getSimpleName();
+    private final int MOVIES_LOADER_ID = 0;
     private final String SORT_ORDER_KEY = "sort_order";
     private final String PAGE_TO_LOAD_KEY = "page_to_load";
     private final String RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
@@ -42,8 +54,9 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     private TextView noConnectionTv;
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
+
     private int pageToLoad = 1;
-    private String sortOrder = POPULAR_PATH;
+    private String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY;
 
     public MoviesFragment() {
     }
@@ -91,14 +104,14 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
             restoreViewState(savedInstanceState);
         }
 
+        getActivity().getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+
         return view;
     }
 
     private void restoreViewState(Bundle savedInstanceState) {
         pageToLoad = savedInstanceState.getInt(PAGE_TO_LOAD_KEY);
         sortOrder = savedInstanceState.getString(SORT_ORDER_KEY);
-        List<Movie> movies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
-        moviesAdapter.swapMovies(movies);
         Parcelable rvState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE_KEY);
         posterRv.getLayoutManager().onRestoreInstanceState(rvState);
         noConnectionTv.setVisibility(savedInstanceState.getInt(NO_CONNECTION_VISIBILITY_KEY));
@@ -107,7 +120,6 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     public void setSortOrder(String sortOrder) {
         Log.d(TAG, "Setting sort order to: " + sortOrder);
         this.sortOrder = sortOrder;
-        moviesAdapter.clearMovieList();
         resetCurrentPage();
         loadData();
     }
@@ -124,12 +136,26 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
-            showProgress();
-            new FetchMoviesFromTmdbTask(getContext(), new FetchMoviesListener()).execute(String.valueOf(pageToLoad), sortOrder);
-            Log.d(TAG, "Loading movies page " + pageToLoad);
+            fetchRemoteData();
         } else {
             showNoConnectionMessage();
         }
+        loadLocalData();
+    }
+
+    private void loadLocalData() {
+        showProgress();
+        getActivity().getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+    }
+
+    private void fetchRemoteData() {
+        Intent intentService = new Intent(getContext(), TmdbFetchIntentService.class);
+        if (sortOrder.equals(MoviesDatabaseContract.MovieEntry.COLUMN_RATING)) {
+            intentService.setAction("fetch_top_rated_movies");
+        } else intentService.setAction("fetch_popular_movies");
+        intentService.putExtra("page", pageToLoad);
+        getActivity().startService(intentService);
+        Log.d(TAG, "Fetching movies page " + pageToLoad);
     }
 
     private void showProgress() {
@@ -151,10 +177,10 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
     }
 
     @Override
-    public void onItemClicked(Movie movie) {
-        Log.d(TAG, "Selected movie: " + movie.getTitle());
+    public void onItemClicked(int movieId) {
+        Log.d(TAG, "Selected movie id: " + movieId);
         Intent intent = new Intent(getContext(), MovieDetailsActivity.class);
-        intent.putExtra(getString(R.string.movie_parcelable_key), movie);
+        intent.setData(MoviesDatabaseContract.MovieEntry.buildMovieEntryUri(movieId));
         startActivity(intent);
     }
 
@@ -165,25 +191,44 @@ public class MoviesFragment extends Fragment implements MoviesAdapter.OnGridItem
         outState.putString(SORT_ORDER_KEY, sortOrder);
         Parcelable rvState = posterRv.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(RECYCLER_VIEW_STATE_KEY, rvState);
-        outState.putParcelableArrayList(MOVIES_KEY, (ArrayList<? extends Parcelable>) moviesAdapter.getMovies());
         outState.putInt(NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
     }
 
-    class FetchMoviesListener implements AsyncTaskListener<List<Movie>> {
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        switch (id) {
+            case MOVIES_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.MovieEntry.CONTENT_URI, MAIN_MOVIE_PROJECTION,
+                        null,
+                        null,
+                        sortOrder + " DESC");
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + id);
+        }
+    }
 
-        @Override
-        public void onCompletion(List<Movie> movies) {
-            if (movies == null) {
-                showNoConnectionMessage();
-            } else {
-                if (pageToLoad == 1) {
-                    moviesAdapter.swapMovies(movies);
-                } else {
-                    moviesAdapter.appendMovieList(movies);
-                }
-                incrementCurrentPage();
-            }
-            hideProgress();
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case MOVIES_LOADER_ID:
+                moviesAdapter.swapCursor(data);
+                hideProgress();
+                break;
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loader.getId());
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        switch (loader.getId()) {
+            case MOVIES_LOADER_ID:
+                moviesAdapter.swapCursor(null);
+                break;
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loader.getId());
         }
     }
 }

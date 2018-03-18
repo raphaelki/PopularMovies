@@ -1,18 +1,17 @@
 package com.example.rapha.popularmovies.movies;
 
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.Movie;
+import com.example.rapha.popularmovies.data.models.Movie;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
@@ -20,6 +19,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     private final String TAG = getClass().getSimpleName();
     private List<Movie> movies;
     private OnGridItemClickedHandler onGridItemClickedHandler;
+    private Cursor cursor;
 
     public MoviesAdapter(List<Movie> movies, OnGridItemClickedHandler onGridItemClickedHandler) {
         this.movies = movies;
@@ -27,7 +27,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     public MoviesAdapter(OnGridItemClickedHandler onGridItemClickedHandler) {
-        this(new ArrayList<Movie>(), onGridItemClickedHandler);
+        this.onGridItemClickedHandler = onGridItemClickedHandler;
     }
 
     @Override
@@ -39,65 +39,50 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
-        holder.bind(movies.get(position));
+        //holder.bind(movies.get(position));
+        cursor.moveToPosition(position);
+        holder.bind(cursor);
     }
 
     @Override
     public int getItemCount() {
-        return movies.size();
+        if (cursor == null) return 0;
+        return cursor.getCount();
     }
 
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    public void swapMovies(List<Movie> movies) {
-        if (movies != null) {
-            Log.d(TAG, "Replacing movie list. New list contains " + movies.size() + " items");
-            this.movies = movies;
+    public void swapCursor(Cursor cursor) {
+        if (cursor != null) {
+            this.cursor = cursor;
             notifyDataSetChanged();
         }
-    }
-
-    public void appendMovieList(List<Movie> movies) {
-        if (movies != null) {
-            this.movies.addAll(movies);
-            Log.d(TAG, "Appending movie list. New size: " + this.movies.size());
-            notifyDataSetChanged();
-        }
-    }
-
-    public void clearMovieList() {
-        movies.clear();
-        notifyDataSetChanged();
     }
 
     interface OnGridItemClickedHandler {
-        void onItemClicked(Movie movie);
+        void onItemClicked(int movieId);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        private Movie movie;
 
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Movie movie) {
-            this.movie = movie;
+        public void bind(Cursor cursor) {
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
-            posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + movie.getTitle());
+            String posterPath = cursor.getString(MoviesFragment.INDEX_MOVIE_POSTER_PATH);
+            String title = cursor.getString(MoviesFragment.INDEX_MOVIE_TITLE);
+            posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + title);
             GlideApp.with(itemView.getContext())
-                    .load(TmdbUtils.getFullImageURL(movie.getPosterPath()))
+                    .load(TmdbUtils.getFullImageURL(posterPath))
                     .placeholder(R.drawable.placeholder)
                     .into(posterIv);
         }
 
         @Override
         public void onClick(View v) {
-            onGridItemClickedHandler.onItemClicked(movie);
+            cursor.moveToPosition(getAdapterPosition());
+            onGridItemClickedHandler.onItemClicked(cursor.getInt(MoviesFragment.INDEX_MOVIE_ID));
         }
     }
 }

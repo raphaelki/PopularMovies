@@ -1,11 +1,16 @@
 package com.example.rapha.popularmovies.utils;
 
+import android.content.ContentValues;
 import android.content.Context;
+
+import com.example.rapha.popularmovies.data.MoviesDatabaseContract;
+import com.example.rapha.popularmovies.data.models.Movie;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class TmdbUtils {
 
@@ -27,5 +32,27 @@ public class TmdbUtils {
             dateShown = tmdbDate;
         }
         return dateShown;
+    }
+
+    public static ContentValues[] getMovieContentValuesFromMovieList(List<Movie> movieList) {
+        ContentValues[] contentValuesArray = new ContentValues[movieList.size()];
+
+        for (int index = 0; index < contentValuesArray.length; index++) {
+            ContentValues movieContentValues = new ContentValues();
+            Movie movie = movieList.get(index);
+
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry._ID, movie.getId());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_RATING, movie.getVoteAverage());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, false);
+
+            contentValuesArray[index] = movieContentValues;
+        }
+        return contentValuesArray;
     }
 }

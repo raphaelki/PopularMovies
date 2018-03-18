@@ -5,9 +5,9 @@ import android.os.AsyncTask;
 
 import com.example.rapha.popularmovies.BuildConfig;
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.Movie;
-import com.example.rapha.popularmovies.data.MovieList;
 import com.example.rapha.popularmovies.data.TmdbApiService;
+import com.example.rapha.popularmovies.data.models.Movie;
+import com.example.rapha.popularmovies.data.models.MovieList;
 import com.example.rapha.popularmovies.listener.AsyncTaskListener;
 
 import java.io.IOException;
