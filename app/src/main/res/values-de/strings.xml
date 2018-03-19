@@ -5,8 +5,9 @@
     <string name="main_no_connection">Keine Datenverbindung verfügbar</string>
 
     <string name="menu_sort_order">Sortieren nach</string>
-    <string name="menu_popular">Derzeit beliebt</string>
-    <string name="menu_top_rated">Höchste Wertung</string>
+    <string name="menu_spinner_popular">Derzeit beliebt</string>
+    <string name="menu_spinner_top_rated">Höchste Wertung</string>
+    <string name="menu_spinner_favorites">Favoriten</string>
 
     <string name="detail_original_title_label">Originaltitel:</string>
     <string name="detail_favorite">Favorit</string>

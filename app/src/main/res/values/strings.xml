@@ -5,8 +5,9 @@
     <string name="main_no_connection">No data connection available</string>
 
     <string name="menu_sort_order">Sort order</string>
-    <string name="menu_popular">Most popular</string>
-    <string name="menu_top_rated">Highest rated</string>
+    <string name="menu_spinner_popular">Most popular</string>
+    <string name="menu_spinner_top_rated">Highest rated</string>
+    <string name="menu_spinner_favorites">Favorites</string>
 
     <string name="detail_rating">%1$s/10</string>
 

@@ -19,8 +19,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,12 +56,14 @@ public class MoviesFragment extends Fragment implements
     private final String STATE_PAGE_TO_LOAD_KEY = "page_to_load";
     private final String STATE_RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
     private final String STATE_NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
+    private final String STATE_SPINNER_POSITION_KEY = "spinner_position";
 
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private int spinnerPosition;
     private int pageToLoad = 1;
     private String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY;
 
@@ -115,10 +122,13 @@ public class MoviesFragment extends Fragment implements
 
         getActivity().getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
 
+        setHasOptionsMenu(true);
+
         return view;
     }
 
     private void restoreViewState(Bundle savedInstanceState) {
+        spinnerPosition = savedInstanceState.getInt(STATE_SPINNER_POSITION_KEY);
         pageToLoad = savedInstanceState.getInt(STATE_PAGE_TO_LOAD_KEY);
         sortOrder = savedInstanceState.getString(STATE_SORT_ORDER_KEY);
         Parcelable rvState = savedInstanceState.getParcelable(STATE_RECYCLER_VIEW_STATE_KEY);
@@ -200,7 +210,37 @@ public class MoviesFragment extends Fragment implements
         outState.putString(STATE_SORT_ORDER_KEY, sortOrder);
         Parcelable rvState = posterRv.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(STATE_RECYCLER_VIEW_STATE_KEY, rvState);
+        outState.putInt(STATE_SPINNER_POSITION_KEY, spinnerPosition);
         outState.putInt(STATE_NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_overview_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.sort_order_spinner);
+        Spinner spinner = (Spinner) menuItem.getActionView();
+        //spinner.setSelection(spinnerPosition);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != spinnerPosition) {
+                    String item = (String) parent.getItemAtPosition(position);
+                    if (item.equals(getString(R.string.menu_spinner_popular))) {
+                        sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY;
+                    } else if (item.equals(getString(R.string.menu_spinner_top_rated))) {
+                        sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_RATING;
+                    } else {
+
+                    }
+                    Log.d(TAG, "Sort criteria changed to: " + item);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @NonNull
