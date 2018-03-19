@@ -24,7 +24,7 @@ public class FetcherTasks {
         String localization = context.getString(R.string.query_localization);
         ContentResolver contentResolver = context.getContentResolver();
         Call<MovieList> movieListCall = tmdbApiService.getPopularMovies(apiKey, pageToLoad, localization);
-        fetchMovieList(movieListCall, contentResolver);
+        fetchMovieList(movieListCall, contentResolver, true);
     }
 
     public static void fetchTopRatedMovies(TmdbApiService tmdbApiService, Context context, int pageToLoad) {
@@ -32,13 +32,13 @@ public class FetcherTasks {
         String localization = context.getString(R.string.query_localization);
         ContentResolver contentResolver = context.getContentResolver();
         Call<MovieList> movieListCall = tmdbApiService.getTopRatedMovies(apiKey, pageToLoad, localization);
-        fetchMovieList(movieListCall, contentResolver);
+        fetchMovieList(movieListCall, contentResolver, false);
     }
 
-    private static void fetchMovieList(Call<MovieList> movieListCall, ContentResolver contentResolver) {
+    private static void fetchMovieList(Call<MovieList> movieListCall, ContentResolver contentResolver, boolean isPopular) {
         try {
             MovieList movieList = movieListCall.execute().body();
-            ContentValues[] contentValues = TmdbUtils.getMovieContentValuesFromMovieList(movieList.getMovies());
+            ContentValues[] contentValues = TmdbUtils.getMovieContentValuesFromMovieList(movieList.getMovies(), isPopular);
             contentResolver.delete(MoviesDatabaseContract.MovieEntry.CONTENT_URI, null, null);
             contentResolver.bulkInsert(MoviesDatabaseContract.MovieEntry.CONTENT_URI, contentValues);
         } catch (IOException e) {

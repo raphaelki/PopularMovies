@@ -34,7 +34,7 @@ public class TmdbUtils {
         return dateShown;
     }
 
-    public static ContentValues[] getMovieContentValuesFromMovieList(List<Movie> movieList) {
+    public static ContentValues[] getMovieContentValuesFromMovieList(List<Movie> movieList, boolean isPopular) {
         ContentValues[] contentValuesArray = new ContentValues[movieList.size()];
 
         for (int index = 0; index < contentValuesArray.length; index++) {
@@ -50,6 +50,8 @@ public class TmdbUtils {
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, false);
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR, isPopular);
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED, !isPopular);
 
             contentValuesArray[index] = movieContentValues;
         }

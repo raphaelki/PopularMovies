@@ -8,23 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.models.Movie;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
-
-import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
 
     private final String TAG = getClass().getSimpleName();
-    private List<Movie> movies;
     private OnGridItemClickedHandler onGridItemClickedHandler;
     private Cursor cursor;
-
-    public MoviesAdapter(List<Movie> movies, OnGridItemClickedHandler onGridItemClickedHandler) {
-        this.movies = movies;
-        this.onGridItemClickedHandler = onGridItemClickedHandler;
-    }
 
     public MoviesAdapter(OnGridItemClickedHandler onGridItemClickedHandler) {
         this.onGridItemClickedHandler = onGridItemClickedHandler;
@@ -39,7 +30,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
-        //holder.bind(movies.get(position));
         cursor.moveToPosition(position);
         holder.bind(cursor);
     }
@@ -70,6 +60,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
         public void bind(Cursor cursor) {
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
+            ImageView favoriteIv = itemView.findViewById(R.id.favorite_iv);
+            Boolean isFavorite = cursor.getInt(MoviesFragment.INDEX_IS_FAVORITE) == 1;
+            favoriteIv.setVisibility(isFavorite ? View.VISIBLE : View.GONE);
             String posterPath = cursor.getString(MoviesFragment.INDEX_MOVIE_POSTER_PATH);
             String title = cursor.getString(MoviesFragment.INDEX_MOVIE_TITLE);
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + title);

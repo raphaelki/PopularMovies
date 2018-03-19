@@ -36,6 +36,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
+                MovieEntry.COLUMN_IS_POPULAR + " INTEGER NOT NULL, " +
+                MovieEntry.COLUMN_IS_TOP_RATED + " INTEGER NOT NULL, " +
                 MovieEntry.COLUMN_IS_FAVORITE + " BOOLEAN NOT NULL" + ");";
     }
 

@@ -153,6 +153,19 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        int updatedEntries;
+        String[] selectionArguments = new String[]{uri.getLastPathSegment()};
+        switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIE:
+                updatedEntries = db.update(MoviesDatabaseContract.MovieEntry.TABLE_NAME,
+                        values,
+                        MoviesDatabaseContract.MovieEntry._ID + " = ?",
+                        selectionArguments);
+                break;
+            default:
+                throw new RuntimeException("Update is not supported for uri: " + uri);
+        }
+        return updatedEntries;
     }
 }

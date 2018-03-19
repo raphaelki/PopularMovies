@@ -27,6 +27,8 @@ public class MoviesDatabaseContract {
         public static final String COLUMN_RUNTIME = "duration";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_POPULARITY = "popularity";
+        public static final String COLUMN_IS_POPULAR = "is_popular";
+        public static final String COLUMN_IS_TOP_RATED = "is_top_rated";
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
 
         public static Uri buildMovieEntryUri(int movieId) {

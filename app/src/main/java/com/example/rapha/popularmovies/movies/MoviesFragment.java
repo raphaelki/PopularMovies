@@ -33,23 +33,25 @@ public class MoviesFragment extends Fragment implements
         MoviesAdapter.OnGridItemClickedHandler,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    public final static String POPULAR_PATH = "popular";
-    public final static String TOP_RATED_PATH = "top_rated";
     public static final String[] MAIN_MOVIE_PROJECTION = {
             MoviesDatabaseContract.MovieEntry._ID,
             MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
-            MoviesDatabaseContract.MovieEntry.COLUMN_TITLE
+            MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
+            MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE
     };
     public static final int INDEX_MOVIE_ID = 0;
     public static final int INDEX_MOVIE_POSTER_PATH = 1;
     public static final int INDEX_MOVIE_TITLE = 2;
+    public static final int INDEX_IS_FAVORITE = 3;
+
     private final String TAG = getClass().getSimpleName();
-    private final int MOVIES_LOADER_ID = 0;
-    private final String SORT_ORDER_KEY = "sort_order";
-    private final String PAGE_TO_LOAD_KEY = "page_to_load";
-    private final String RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
-    private final String MOVIES_KEY = "movies";
-    private final String NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
+    private final int MOVIES_LOADER_ID = 4563;
+
+    private final String STATE_SORT_ORDER_KEY = "sort_order";
+    private final String STATE_PAGE_TO_LOAD_KEY = "page_to_load";
+    private final String STATE_RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
+    private final String STATE_NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
+
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
@@ -59,6 +61,13 @@ public class MoviesFragment extends Fragment implements
     private String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY;
 
     public MoviesFragment() {
+    }
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart");
+        getActivity().getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+        super.onStart();
     }
 
     @Nullable
@@ -110,11 +119,11 @@ public class MoviesFragment extends Fragment implements
     }
 
     private void restoreViewState(Bundle savedInstanceState) {
-        pageToLoad = savedInstanceState.getInt(PAGE_TO_LOAD_KEY);
-        sortOrder = savedInstanceState.getString(SORT_ORDER_KEY);
-        Parcelable rvState = savedInstanceState.getParcelable(RECYCLER_VIEW_STATE_KEY);
+        pageToLoad = savedInstanceState.getInt(STATE_PAGE_TO_LOAD_KEY);
+        sortOrder = savedInstanceState.getString(STATE_SORT_ORDER_KEY);
+        Parcelable rvState = savedInstanceState.getParcelable(STATE_RECYCLER_VIEW_STATE_KEY);
         posterRv.getLayoutManager().onRestoreInstanceState(rvState);
-        noConnectionTv.setVisibility(savedInstanceState.getInt(NO_CONNECTION_VISIBILITY_KEY));
+        noConnectionTv.setVisibility(savedInstanceState.getInt(STATE_NO_CONNECTION_VISIBILITY_KEY));
     }
 
     public void setSortOrder(String sortOrder) {
@@ -187,11 +196,11 @@ public class MoviesFragment extends Fragment implements
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(PAGE_TO_LOAD_KEY, pageToLoad);
-        outState.putString(SORT_ORDER_KEY, sortOrder);
+        outState.putInt(STATE_PAGE_TO_LOAD_KEY, pageToLoad);
+        outState.putString(STATE_SORT_ORDER_KEY, sortOrder);
         Parcelable rvState = posterRv.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(RECYCLER_VIEW_STATE_KEY, rvState);
-        outState.putInt(NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
+        outState.putParcelable(STATE_RECYCLER_VIEW_STATE_KEY, rvState);
+        outState.putInt(STATE_NO_CONNECTION_VISIBILITY_KEY, noConnectionTv.getVisibility());
     }
 
     @NonNull
