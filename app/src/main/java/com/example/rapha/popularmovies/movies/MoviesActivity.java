@@ -19,6 +19,8 @@ public class MoviesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 
+        getSupportActionBar().hide();
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         moviesFragment = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
         if (moviesFragment == null) {
@@ -26,43 +28,4 @@ public class MoviesActivity extends AppCompatActivity {
             fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesFragment).commit();
         }
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.movie_overview_menu, menu);
-//        MenuItem menuItem = menu.findItem(R.id.sort_order_spinner);
-//        Spinner spinner = (Spinner) menuItem.getActionView();
-//        spinner.setSelection(spinnerPosition);
-//        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String item = (String) parent.getItemAtPosition(position);
-//                if (isUserInteracting) {
-//                    spinnerPosition = position;
-//                    Log.d(TAG, "Sort order selected: " + item);
-//                    String popularSortOrder = getString(R.string.menu_popular);
-//                    String topRatedSortOrder = getString(R.string.menu_top_rated);
-//                    if (item.equals(popularSortOrder)) {
-//                        moviesFragment.setSortOrder(MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY);
-//                    } else if (item.equals(topRatedSortOrder)) {
-//                        moviesFragment.setSortOrder(MoviesDatabaseContract.MovieEntry.COLUMN_RATING);
-//                    } else {
-//                        throw new RuntimeException("Sort order not implemented: " + item);
-//                    }
-//                    isUserInteracting = false;
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//            }
-//        });
-//        return true;
-//    }
-
-//    @Override
-//    public void onUserInteraction() {
-//        super.onUserInteraction();
-//        isUserInteracting = true;
-//    }
 }

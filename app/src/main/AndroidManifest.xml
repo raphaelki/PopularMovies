@@ -25,7 +25,7 @@
             android:parentActivityName=".movies.MoviesActivity" />
 
         <provider
-            android:name=".data.MovieProvider"
+            android:name=".data.local.MovieProvider"
             android:authorities="com.example.rapha.popularmovies"
             android:exported="false" />
 

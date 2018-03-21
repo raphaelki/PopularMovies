@@ -3,7 +3,7 @@ package com.example.rapha.popularmovies.utils;
 import android.content.ContentValues;
 import android.content.Context;
 
-import com.example.rapha.popularmovies.data.MoviesDatabaseContract;
+import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.data.models.Movie;
 
 import java.text.DateFormat;
@@ -34,7 +34,7 @@ public class TmdbUtils {
         return dateShown;
     }
 
-    public static ContentValues[] getMovieContentValuesFromMovieList(List<Movie> movieList, boolean isPopular) {
+    public static ContentValues[] getMovieContentValuesFromMovieList(List<Movie> movieList, boolean isPopular, List<Integer> favoriteIds) {
         ContentValues[] contentValuesArray = new ContentValues[movieList.size()];
 
         for (int index = 0; index < contentValuesArray.length; index++) {
@@ -49,12 +49,19 @@ public class TmdbUtils {
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
-            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, false);
+            movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, isMovieAFavorite(movie.getId(), favoriteIds));
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR, isPopular);
             movieContentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED, !isPopular);
 
             contentValuesArray[index] = movieContentValues;
         }
         return contentValuesArray;
+    }
+
+    private static boolean isMovieAFavorite(int movieId, List<Integer> favoriteIds) {
+        for (int id : favoriteIds) {
+            if (movieId == id) return true;
+        }
+        return false;
     }
 }

@@ -2,12 +2,14 @@ package com.example.rapha.popularmovies.movies;
 
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.rapha.popularmovies.R;
+import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
 
@@ -42,6 +44,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     public void swapCursor(Cursor cursor) {
         if (cursor != null) {
+            Log.d(TAG, "Cursor swapped");
             this.cursor = cursor;
             notifyDataSetChanged();
         }
@@ -61,10 +64,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         public void bind(Cursor cursor) {
             ImageView posterIv = itemView.findViewById(R.id.poster_item_iv);
             ImageView favoriteIv = itemView.findViewById(R.id.favorite_iv);
-            Boolean isFavorite = cursor.getInt(MoviesFragment.INDEX_IS_FAVORITE) == 1;
+            Boolean isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
             favoriteIv.setVisibility(isFavorite ? View.VISIBLE : View.GONE);
-            String posterPath = cursor.getString(MoviesFragment.INDEX_MOVIE_POSTER_PATH);
-            String title = cursor.getString(MoviesFragment.INDEX_MOVIE_TITLE);
+            String posterPath = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH));
+            String title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + title);
             GlideApp.with(itemView.getContext())
                     .load(TmdbUtils.getFullImageURL(posterPath))
@@ -75,7 +78,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         @Override
         public void onClick(View v) {
             cursor.moveToPosition(getAdapterPosition());
-            onGridItemClickedHandler.onItemClicked(cursor.getInt(MoviesFragment.INDEX_MOVIE_ID));
+            onGridItemClickedHandler.onItemClicked(cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry._ID)));
         }
     }
 }

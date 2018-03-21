@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_search"
+        android:id="@+id/action_popular"
         android:icon="@drawable/ic_whatshot_black_24dp"
         android:title="@string/menu_spinner_popular" />
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_top_rated"
         android:icon="@drawable/ic_star"
         android:title="@string/menu_spinner_top_rated" />
     <item
-        android:id="@+id/action_navigation"
+        android:id="@+id/action_favorites"
         android:icon="@drawable/ic_favorite"
         android:title="@string/menu_spinner_favorites" />
 </menu>

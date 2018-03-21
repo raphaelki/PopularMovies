@@ -1,15 +1,13 @@
 package com.example.rapha.popularmovies.details;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,36 +20,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.MoviesDatabaseContract;
+import com.example.rapha.popularmovies.data.MovieRepository;
+import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
 
 public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public static final String[] DETAIL_MOVIE_PROJECTION = {
-            MoviesDatabaseContract.MovieEntry._ID,
-            MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
-            MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
-            MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW,
-            MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE,
-            MoviesDatabaseContract.MovieEntry.COLUMN_RATING,
-            MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
-            MoviesDatabaseContract.MovieEntry.COLUMN_RUNTIME,
-            MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE
-    };
-    public static final int INDEX_MOVIE_ID = 0;
-    public static final int INDEX_MOVIE_POSTER_PATH = 1;
-    public static final int INDEX_MOVIE_TITLE = 2;
-    public static final int INDEX_MOVIE_OVERVIEW = 3;
-    public static final int INDEX_MOVIE_RELEASE_DATE = 4;
-    public static final int INDEX_MOVIE_RATING = 5;
-    public static final int INDEX_MOVIE_ORIGINAL_TITLE = 6;
-    public static final int INDEX_MOVIE_RUNTIME = 7;
-    public static final int INDEX_IS_FAVORITE = 8;
-
     private final String TAG = getClass().getSimpleName();
     private final int DETAIL_LOADER_ID = 13452;
-    private final int FAVORITE_UPDATE_LOADER_ID = 452789;
     private TextView titleTv;
     private TextView originalTitleTv;
     private ImageView posterIv;
@@ -62,14 +39,15 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private boolean isFavorite;
 
-    private Uri movieUri;
+    private int movieId;
+    private MovieRepository movieRepository;
 
     public MovieDetailFragment() {
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-
+        movieRepository = MovieRepository.getInstance(getContext().getContentResolver());
         super.onCreate(savedInstanceState);
     }
 
@@ -87,7 +65,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         yearTv = view.findViewById(R.id.detail_year);
         posterIv = view.findViewById(R.id.detaill_poster_iv);
 
-        movieUri = getArguments().getParcelable("movie_uri");
+        movieId = getArguments().getInt("movie_id");
 
         setHasOptionsMenu(true);
         return view;
@@ -95,28 +73,60 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private void populateView(Cursor cursor) {
         Log.d(TAG, "populateView");
-        titleTv.setText(cursor.getString(INDEX_MOVIE_TITLE));
-        originalTitleTv.setText(cursor.getString(INDEX_MOVIE_ORIGINAL_TITLE));
-        yearTv.setText(TmdbUtils.convertTmdbDateToLocalDateFormat(getContext(), cursor.getString(INDEX_MOVIE_RELEASE_DATE)));
-        ratingTv.setText(getString(R.string.detail_rating, String.valueOf(cursor.getDouble(INDEX_MOVIE_RATING))));
-        plotTv.setText(cursor.getString(INDEX_MOVIE_OVERVIEW));
-        isFavorite = cursor.getInt(INDEX_IS_FAVORITE) == 1;
+        titleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
+        originalTitleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE)));
+        yearTv.setText(TmdbUtils.convertTmdbDateToLocalDateFormat(getContext(), cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE))));
+        ratingTv.setText(getString(R.string.detail_rating, String.valueOf(cursor.getDouble(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RATING)))));
+        plotTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
+        isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
-        String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(INDEX_MOVIE_POSTER_PATH));
+        String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
     }
 
+    @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         switch (id) {
             case DETAIL_LOADER_ID:
-                return new CursorLoader(getContext(),
-                        movieUri,
-                        DETAIL_MOVIE_PROJECTION,
-                        null,
-                        null,
-                        null);
+                return new AsyncTaskLoader<Cursor>(getContext()) {
+                    ForceLoadContentObserver contentObserver = new ForceLoadContentObserver();
+                    Cursor cursor = null;
+
+                    @Override
+                    public void deliverResult(@Nullable Cursor data) {
+                        Log.d(TAG, "deliverResult");
+                        cursor = data;
+                        super.deliverResult(data);
+                    }
+
+                    @Override
+                    public Cursor loadInBackground() {
+                        Log.d(TAG, "Running loader");
+                        Cursor cursor;
+                        cursor = movieRepository.getMovie(movieId);
+                        if (cursor != null) cursor.registerContentObserver(contentObserver);
+                        return cursor;
+                    }
+
+                    @Override
+                    protected void onStartLoading() {
+                        Log.d(TAG, "onStartLoading");
+                        if (cursor != null) {
+                            deliverResult(cursor);
+                        } else {
+                            forceLoad();
+                        }
+                    }
+
+                    @Override
+                    protected void onReset() {
+                        Log.d(TAG, "onReset");
+                        if (cursor != null) cursor.close();
+                        super.onReset();
+                    }
+                };
             default:
                 throw new RuntimeException("Unknown loader id: " + id);
         }
@@ -146,19 +156,14 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     private void callMovieLoader() {
-        if (movieUri != null) {
-            getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
-        }
+        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.favorite_action) {
             isFavorite = !isFavorite;
-            ContentResolver contentResolver = getActivity().getContentResolver();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, isFavorite);
-            contentResolver.update(movieUri, contentValues, null, null);
+            movieRepository.changeMovieFavoriteStatus(movieId, isFavorite);
             setFavoriteButtonIcon();
         }
         return super.onOptionsItemSelected(item);

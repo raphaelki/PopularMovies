@@ -1,4 +1,4 @@
-package com.example.rapha.popularmovies.data;
+package com.example.rapha.popularmovies.data.remote;
 
 import com.example.rapha.popularmovies.data.models.MovieDetails;
 import com.example.rapha.popularmovies.data.models.MovieList;
@@ -8,7 +8,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface TmdbApiService {
+public interface TmdbApi {
 
     @GET("popular")
     Call<MovieList> getPopularMovies(@Query("api_key") String api_key, @Query("page") int page, @Query("language") String language);

@@ -1,4 +1,4 @@
-package com.example.rapha.popularmovies.data;
+package com.example.rapha.popularmovies.data.local;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -163,9 +163,16 @@ public class MovieProvider extends ContentProvider {
                         MoviesDatabaseContract.MovieEntry._ID + " = ?",
                         selectionArguments);
                 break;
+            case CODE_MOVIES:
+                updatedEntries = db.update(MoviesDatabaseContract.MovieEntry.TABLE_NAME,
+                        values,
+                        null,
+                        null);
+                break;
             default:
                 throw new RuntimeException("Update is not supported for uri: " + uri);
         }
+        getContext().getContentResolver().notifyChange(uri, null);
         return updatedEntries;
     }
 }
