@@ -2,6 +2,8 @@ package com.example.rapha.popularmovies.data.remote;
 
 import com.example.rapha.popularmovies.data.models.MovieDetails;
 import com.example.rapha.popularmovies.data.models.MovieList;
+import com.example.rapha.popularmovies.data.models.ReviewResponse;
+import com.example.rapha.popularmovies.data.models.VideoResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,4 +20,10 @@ public interface TmdbApi {
 
     @GET("{movie_id}?append_to_response=videos,reviews")
     Call<MovieDetails> getMovieDetails(@Path("movie_id") int movieId, @Query("api_key") String api_key, @Query("language") String language);
+
+    @GET("{movie_id}/videos")
+    Call<VideoResponse> getTrailers(@Path("movie_id") int movieId, @Query("api_key") String api_key, @Query("language") String language);
+
+    @GET("{movie_id}/reviews")
+    Call<ReviewResponse> getReviews(@Path("movie_id") int movieId, @Query("api_key") String api_key, @Query("language") String language);
 }

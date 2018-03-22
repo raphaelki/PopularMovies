@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.data.models.Movie;
+import com.example.rapha.popularmovies.data.models.Review;
+import com.example.rapha.popularmovies.data.models.Video;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -63,5 +65,39 @@ public class TmdbUtils {
             if (movieId == id) return true;
         }
         return false;
+    }
+
+    public static ContentValues[] getTrailerContentValuesformVideoList(List<Video> trailerList, int movieId) {
+        ContentValues[] contentValuesArray = new ContentValues[trailerList.size()];
+
+        for (int index = 0; index < contentValuesArray.length; index++) {
+            ContentValues trailerContentValues = new ContentValues();
+            Video trailer = trailerList.get(index);
+
+            trailerContentValues.put(MoviesDatabaseContract.TrailerEntry._ID, trailer.getId());
+            trailerContentValues.put(MoviesDatabaseContract.TrailerEntry.COLUMN_TITLE, trailer.getName());
+            trailerContentValues.put(MoviesDatabaseContract.TrailerEntry.COLUMN_YOUTUBE_KEY, trailer.getKey());
+            trailerContentValues.put(MoviesDatabaseContract.TrailerEntry.COLUMN_MOVIE_ID, movieId);
+
+            contentValuesArray[index] = trailerContentValues;
+        }
+        return contentValuesArray;
+    }
+
+    public static ContentValues[] getReviewContentValuesformVideoList(List<Review> reviewList, int movieId) {
+        ContentValues[] contentValuesArray = new ContentValues[reviewList.size()];
+
+        for (int index = 0; index < contentValuesArray.length; index++) {
+            ContentValues reviewContentValues = new ContentValues();
+            Review review = reviewList.get(index);
+
+            reviewContentValues.put(MoviesDatabaseContract.ReviewEntry._ID, review.getId());
+            reviewContentValues.put(MoviesDatabaseContract.ReviewEntry.COLUMN_CONTENT, review.getContent());
+            reviewContentValues.put(MoviesDatabaseContract.ReviewEntry.COLUMN_AUTHOR, review.getAuthor());
+            reviewContentValues.put(MoviesDatabaseContract.ReviewEntry.COLUMN_MOVIE_ID, movieId);
+
+            contentValuesArray[index] = reviewContentValues;
+        }
+        return contentValuesArray;
     }
 }

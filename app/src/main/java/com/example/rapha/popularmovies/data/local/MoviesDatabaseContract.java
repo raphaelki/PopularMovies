@@ -37,7 +37,6 @@ public class MoviesDatabaseContract {
         }
     }
 
-
     public static final class ReviewEntry implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI
                 .buildUpon()
@@ -47,6 +46,10 @@ public class MoviesDatabaseContract {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_AUTHOR = "author";
+
+        public static Uri buildReviewEntryUri(int movieId) {
+            return CONTENT_URI.buildUpon().appendEncodedPath(String.valueOf(movieId)).build();
+        }
     }
 
     public static final class TrailerEntry implements BaseColumns {
@@ -58,5 +61,9 @@ public class MoviesDatabaseContract {
         public static final String COLUMN_MOVIE_ID = "movie_id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_YOUTUBE_KEY = "youtube_key";
+
+        public static Uri buildTrailerEntryUri(int movieId) {
+            return CONTENT_URI.buildUpon().appendEncodedPath(String.valueOf(movieId)).build();
+        }
     }
 }

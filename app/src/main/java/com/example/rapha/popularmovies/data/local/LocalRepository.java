@@ -2,17 +2,18 @@ package com.example.rapha.popularmovies.data.local;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 
 import java.util.Date;
 
 public class LocalRepository {
 
-    private final String[] booleanTrueSelectionArgs = new String[]{"1"};
+    private final String[] booleanTrueSelectionArgs = {"1"};
     private ContentResolver contentResolver;
 
-    public LocalRepository(ContentResolver contentResolver) {
-        this.contentResolver = contentResolver;
+    public LocalRepository(Context context) {
+        this.contentResolver = context.getContentResolver();
     }
 
     public Cursor getPopularMovies() {
@@ -83,5 +84,21 @@ public class LocalRepository {
         contentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE, isFavorite);
         contentValues.put(MoviesDatabaseContract.MovieEntry.COLUMN_DATE_ADDED_TO_FAVORITES, isFavorite ? date.getTime() : null);
         contentResolver.update(MoviesDatabaseContract.MovieEntry.buildMovieEntryUri(movieId), contentValues, null, null);
+    }
+
+    public Cursor getTrailers(int movieId) {
+        return contentResolver.query(MoviesDatabaseContract.TrailerEntry.buildTrailerEntryUri(movieId),
+                null,
+                null,
+                null,
+                null);
+    }
+
+    public Cursor getReviews(int movieId) {
+        return contentResolver.query(MoviesDatabaseContract.ReviewEntry.buildReviewEntryUri(movieId),
+                null,
+                null,
+                null,
+                null);
     }
 }

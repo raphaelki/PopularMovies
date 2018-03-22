@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -16,7 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,6 +30,7 @@ import android.widget.Toast;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.MovieRepository;
+import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
 import com.example.rapha.popularmovies.details.MovieDetailsActivity;
 import com.example.rapha.popularmovies.utils.Constants;
 
@@ -40,16 +39,25 @@ public class MoviesFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String TAG = getClass().getSimpleName();
-    private final int ASYNC_MOVIES_LOADER_ID = 2325;
-    private final int INITIAL_PAGES_TO_FETCH = 3;
-
-    private final String POPULAR = "popular";
-    private final String TOP_RATED = "top_rated";
-    private final String FAVORITE = "favorite";
+    private final int POPULAR_MOVIES_LOADER_ID = 2325;
+    private final int TOP_RATED_MOVIES_LOADER_ID = 2326;
+    private final int FAVORITE_MOVIES_LOADER_ID = 2327;
+    private final int POPULAR = 0;
+    private final int TOP_RATED = 1;
+    private final int FAVORITE = 2;
     private final String STATE_PAGE_TO_LOAD_KEY = "page_to_load";
     private final String STATE_RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
     private final String STATE_NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
-    private String sortOrder = POPULAR;
+    private String[] projection = {
+            MoviesDatabaseContract.MovieEntry._ID,
+            MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
+            MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
+            MoviesDatabaseContract.MovieEntry.COLUMN_TITLE
+    };
+    private Cursor popularMoviesCursor;
+    private Cursor topRatedMoviesCursor;
+    private Cursor favoriteMovieCursor;
+    private int currentTab = POPULAR;
     private MoviesAdapter moviesAdapter;
     private TextView noConnectionTv;
     private RecyclerView posterRv;
@@ -63,20 +71,13 @@ public class MoviesFragment extends Fragment implements
     public MoviesFragment() {
     }
 
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart");
-        restartLoader();
-        super.onStart();
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
-        movieRepository = MovieRepository.getInstance(getContext().getContentResolver());
+        movieRepository = MovieRepository.getInstance(getContext());
 
         noConnectionTv = view.findViewById(R.id.no_connection_tv);
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
@@ -87,7 +88,7 @@ public class MoviesFragment extends Fragment implements
             @Override
             public void onRefresh() {
                 Log.d(TAG, "Refreshing data");
-                fetchRemoteData();
+                movieRepository.initialRemoteFetch();
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
@@ -104,7 +105,14 @@ public class MoviesFragment extends Fragment implements
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (!recyclerView.canScrollVertically(1) && dy > 0) {
-
+                    switch (currentTab) {
+                        case TOP_RATED:
+                            movieRepository.fetchAdditionalTopRatedMovies();
+                            break;
+                        case POPULAR:
+                            movieRepository.fetchAdditionalPopularMovies();
+                            break;
+                    }
                 }
             }
         });
@@ -116,21 +124,23 @@ public class MoviesFragment extends Fragment implements
                     switch (item.getItemId()) {
                         case R.id.action_popular:
                             Log.d(TAG, "Popular movies selected.");
-                            sortOrder = POPULAR;
+                            moviesAdapter.swapCursor(popularMoviesCursor);
                             swipeRefreshLayout.setEnabled(true);
+                            currentTab = POPULAR;
                             break;
                         case R.id.action_top_rated:
                             Log.d(TAG, "Top rated movies selected.");
-                            sortOrder = TOP_RATED;
+                            moviesAdapter.swapCursor(topRatedMoviesCursor);
                             swipeRefreshLayout.setEnabled(true);
+                            currentTab = TOP_RATED;
                             break;
                         case R.id.action_favorites:
                             Log.d(TAG, "Favorite movies selected.");
-                            sortOrder = FAVORITE;
+                            moviesAdapter.swapCursor(favoriteMovieCursor);
                             swipeRefreshLayout.setEnabled(false);
+                            currentTab = FAVORITE;
                             break;
                     }
-                    restartLoader();
                     return true;
                 }
                 return false;
@@ -141,17 +151,15 @@ public class MoviesFragment extends Fragment implements
             restoreViewState(savedInstanceState);
         }
 
-        getActivity().getSupportLoaderManager().initLoader(ASYNC_MOVIES_LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().initLoader(POPULAR_MOVIES_LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().initLoader(TOP_RATED_MOVIES_LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
 
-        IntentFilter intentServiceFilter = new IntentFilter(Constants.FETCHING_DATA_FINISHED_ACTION);
+        IntentFilter intentServiceFilter = new IntentFilter(Constants.INTENT_SERVICE_BROADCAST_ACTION);
         FetchingStateReceiver fetchingStateReceiver = new FetchingStateReceiver();
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(fetchingStateReceiver, intentServiceFilter);
 
         return view;
-    }
-
-    private void restartLoader() {
-        getActivity().getSupportLoaderManager().restartLoader(ASYNC_MOVIES_LOADER_ID, null, this);
     }
 
     private void restoreViewState(Bundle savedInstanceState) {
@@ -162,44 +170,27 @@ public class MoviesFragment extends Fragment implements
         noConnectionTv.setVisibility(savedInstanceState.getInt(STATE_NO_CONNECTION_VISIBILITY_KEY));
     }
 
-    private void resetCurrentPage() {
-        pageToLoad = 1;
-    }
-
-    private void incrementCurrentPage() {
-        pageToLoad++;
-    }
-
-//    private void loadLocalData() {
-//        getActivity().getSupportLoaderManager().restartLoader(ASYNC_MOVIES_LOADER_ID, null, this);
-//    }
-
-    private void fetchRemoteData() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
-            movieRepository.initialRemoteFetch(getContext());
-        } else {
-            showNoConnectionMessage();
-        }
-    }
-
     private void showProgress() {
+        Log.d(TAG, "showProgress");
         swipeRefreshLayout.setRefreshing(true);
-        noConnectionTv.setVisibility(View.GONE);
     }
 
     private void hideProgress() {
+        Log.d(TAG, "hideProgress");
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void showNoConnectionMessage() {
+        Log.d(TAG, "showNoConnectionMessage");
         if (moviesAdapter.getItemCount() > 0) {
             Toast.makeText(getContext(), getString(R.string.main_no_connection), Toast.LENGTH_LONG).show();
         } else {
             noConnectionTv.setVisibility(View.VISIBLE);
         }
-        hideProgress();
+    }
+
+    private void hideNoConnectionMessage() {
+        noConnectionTv.setVisibility(View.GONE);
     }
 
     @Override
@@ -224,54 +215,29 @@ public class MoviesFragment extends Fragment implements
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        String[] trueSelectionArgs = {"1"};
         switch (id) {
-            case ASYNC_MOVIES_LOADER_ID:
-                return new AsyncTaskLoader<Cursor>(getContext()) {
-                    ForceLoadContentObserver contentObserver = new ForceLoadContentObserver();
-                    Cursor cursor = null;
-
-                    @Override
-                    public void deliverResult(@Nullable Cursor data) {
-                        Log.d(TAG, "deliverResult");
-                        cursor = data;
-                        super.deliverResult(data);
-                    }
-
-                    @Override
-                    public Cursor loadInBackground() {
-                        Log.d(TAG, "Running loader");
-                        Cursor cursor = null;
-                        switch (sortOrder) {
-                            case POPULAR:
-                                cursor = movieRepository.getPopularMovies();
-                                break;
-                            case TOP_RATED:
-                                cursor = movieRepository.getTopRatedMovies();
-                                break;
-                            case FAVORITE:
-                                cursor = movieRepository.getFavoriteMovies();
-                        }
-                        if (cursor != null) cursor.registerContentObserver(contentObserver);
-                        return cursor;
-                    }
-
-                    @Override
-                    protected void onStartLoading() {
-                        Log.d(TAG, "onStartLoading");
-                        if (cursor != null) {
-                            deliverResult(cursor);
-                        } else {
-                            forceLoad();
-                        }
-                    }
-
-                    @Override
-                    protected void onReset() {
-                        Log.d(TAG, "onReset");
-                        if (cursor != null) cursor.close();
-                        super.onReset();
-                    }
-                };
+            case POPULAR_MOVIES_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                        projection,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR + " = ?",
+                        trueSelectionArgs,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY + " DESC");
+            case TOP_RATED_MOVIES_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                        projection,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED + " = ?",
+                        trueSelectionArgs,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_RATING + " DESC");
+            case FAVORITE_MOVIES_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                        projection,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE + " = ?",
+                        trueSelectionArgs,
+                        MoviesDatabaseContract.MovieEntry.COLUMN_DATE_ADDED_TO_FAVORITES + " DESC");
             default:
                 throw new RuntimeException("Loader Not Implemented: " + id);
         }
@@ -281,35 +247,56 @@ public class MoviesFragment extends Fragment implements
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         Log.d(TAG, "Loader finished: " + loader.getId());
         switch (loader.getId()) {
-            case ASYNC_MOVIES_LOADER_ID:
-                if (data.getCount() == 0 && sortOrder.equals(FAVORITE)) {
-                    fetchRemoteData();
+            case POPULAR_MOVIES_LOADER_ID:
+                Log.d(TAG, "pop mov");
+                if (data.getCount() == 0) {
+                    movieRepository.initialRemoteFetch();
+                    showProgress();
+                    return;
                 }
-                moviesAdapter.swapCursor(data);
+                popularMoviesCursor = data;
+                if (currentTab == POPULAR) moviesAdapter.swapCursor(data);
+                break;
+            case TOP_RATED_MOVIES_LOADER_ID:
+                Log.d(TAG, "top rated mov");
+                topRatedMoviesCursor = data;
+                if (currentTab == TOP_RATED) moviesAdapter.swapCursor(data);
+                break;
+            case FAVORITE_MOVIES_LOADER_ID:
+                Log.d(TAG, "fav mov");
+                favoriteMovieCursor = data;
+                if (currentTab == FAVORITE) moviesAdapter.swapCursor(data);
                 break;
             default:
                 throw new RuntimeException("Loader Not Implemented: " + loader.getId());
         }
+        hideNoConnectionMessage();
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        Log.d(TAG, "Resetting loader: " + loader.getId());
-        switch (loader.getId()) {
-            case ASYNC_MOVIES_LOADER_ID:
-                moviesAdapter.swapCursor(null);
-                break;
-            default:
-                throw new RuntimeException("Loader Not Implemented: " + loader.getId());
-        }
     }
 
     private class FetchingStateReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive");
-            hideProgress();
+            String message = intent.getStringExtra(Constants.INTENT_SERVICE_BROADCAST_MESSAGE);
+            switch (message) {
+                case Constants.FETCH_POPULAR_MOVIES_FINISHED_MESSAGE:
+                    Log.d(TAG, "Fetched popular movies");
+                    hideProgress();
+                    break;
+                case Constants.FETCH_TOP_RATED_MOVIES_FINISHED_MESSAGE:
+                    Log.d(TAG, "Fetched top rated movies");
+                    hideProgress();
+                    break;
+                case Constants.NO_CONNECTION_MESSAGE:
+                    Log.d(TAG, "No connection available");
+                    showNoConnectionMessage();
+                    hideProgress();
+                    break;
+            }
         }
     }
 }

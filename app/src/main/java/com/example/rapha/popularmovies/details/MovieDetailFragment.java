@@ -7,8 +7,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.rapha.popularmovies.R;
@@ -29,6 +32,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private final String TAG = getClass().getSimpleName();
     private final int DETAIL_LOADER_ID = 13452;
+    private final int TRAILER_LOADER_ID = 23429;
+    private final int REVIEW_LOADER_ID = 23430;
     private TextView titleTv;
     private TextView originalTitleTv;
     private ImageView posterIv;
@@ -36,18 +41,23 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView ratingTv;
     private TextView plotTv;
     private MenuItem favoriteButton;
+    private RecyclerView trailerRv;
+    private ListView reviewLv;
+    private LinearLayoutManager trailerLayoutManager;
 
     private boolean isFavorite;
 
     private int movieId;
     private MovieRepository movieRepository;
+    private TrailerAdapter trailerAdapter;
+    private ReviewCursorAdapter reviewAdapter;
 
     public MovieDetailFragment() {
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        movieRepository = MovieRepository.getInstance(getContext().getContentResolver());
+        movieRepository = MovieRepository.getInstance(getContext());
         super.onCreate(savedInstanceState);
     }
 
@@ -64,8 +74,22 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         ratingTv = view.findViewById(R.id.detail_rating);
         yearTv = view.findViewById(R.id.detail_year);
         posterIv = view.findViewById(R.id.detaill_poster_iv);
+        trailerRv = view.findViewById(R.id.detail_trailer_rv);
+        reviewLv = view.findViewById(R.id.detail_review_lv);
 
         movieId = getArguments().getInt("movie_id");
+
+        trailerAdapter = new TrailerAdapter();
+        trailerLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        trailerRv.setLayoutManager(trailerLayoutManager);
+        trailerRv.setHasFixedSize(true);
+        trailerRv.setAdapter(trailerAdapter);
+
+        reviewAdapter = new ReviewCursorAdapter(getContext(), null);
+        reviewLv.setAdapter(reviewAdapter);
+
+        getActivity().getSupportLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
 
         setHasOptionsMenu(true);
         return view;
@@ -90,43 +114,26 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         switch (id) {
             case DETAIL_LOADER_ID:
-                return new AsyncTaskLoader<Cursor>(getContext()) {
-                    ForceLoadContentObserver contentObserver = new ForceLoadContentObserver();
-                    Cursor cursor = null;
-
-                    @Override
-                    public void deliverResult(@Nullable Cursor data) {
-                        Log.d(TAG, "deliverResult");
-                        cursor = data;
-                        super.deliverResult(data);
-                    }
-
-                    @Override
-                    public Cursor loadInBackground() {
-                        Log.d(TAG, "Running loader");
-                        Cursor cursor;
-                        cursor = movieRepository.getMovie(movieId);
-                        if (cursor != null) cursor.registerContentObserver(contentObserver);
-                        return cursor;
-                    }
-
-                    @Override
-                    protected void onStartLoading() {
-                        Log.d(TAG, "onStartLoading");
-                        if (cursor != null) {
-                            deliverResult(cursor);
-                        } else {
-                            forceLoad();
-                        }
-                    }
-
-                    @Override
-                    protected void onReset() {
-                        Log.d(TAG, "onReset");
-                        if (cursor != null) cursor.close();
-                        super.onReset();
-                    }
-                };
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.MovieEntry.buildMovieEntryUri(movieId),
+                        null,
+                        null,
+                        null,
+                        null);
+            case TRAILER_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.TrailerEntry.buildTrailerEntryUri(movieId),
+                        null,
+                        null,
+                        null,
+                        null);
+            case REVIEW_LOADER_ID:
+                return new CursorLoader(getContext(),
+                        MoviesDatabaseContract.ReviewEntry.buildReviewEntryUri(movieId),
+                        null,
+                        null,
+                        null,
+                        null);
             default:
                 throw new RuntimeException("Unknown loader id: " + id);
         }
@@ -134,12 +141,31 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null && cursor.moveToFirst()) populateView(cursor);
+        switch (loader.getId()) {
+            case DETAIL_LOADER_ID:
+                if (cursor != null && cursor.moveToFirst()) populateView(cursor);
+                break;
+            case TRAILER_LOADER_ID:
+                if (cursor != null) {
+                    if (cursor.getCount() == 0)
+                        movieRepository.fetchTrailers(movieId);
+                    else cursor.moveToFirst();
+                    trailerAdapter.swapCursor(cursor);
+                }
+                break;
+            case REVIEW_LOADER_ID:
+                if (cursor != null) {
+                    if (cursor.getCount() == 0)
+                        movieRepository.fetchReviews(movieId);
+                    else cursor.moveToFirst();
+                    reviewAdapter.swapCursor(cursor);
+                }
+                break;
+        }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
     }
 
     private void setFavoriteButtonIcon() {
@@ -158,6 +184,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private void callMovieLoader() {
         getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

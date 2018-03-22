@@ -16,7 +16,9 @@ public class MovieProvider extends ContentProvider {
     private final static int CODE_MOVIES = 100;
     private final static int CODE_MOVIE = 101;
     private final static int CODE_REVIEWS = 200;
+    private final static int CODE_REVIEW = 201;
     private final static int CODE_TRAILERS = 300;
+    private final static int CODE_TRAILER = 301;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private final String TAG = getClass().getSimpleName();
     private MovieDbHelper databaseHelper;
@@ -27,7 +29,9 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MoviesDatabaseContract.PATH_MOVIES, CODE_MOVIES);
         matcher.addURI(authority, MoviesDatabaseContract.PATH_MOVIES + "/#", CODE_MOVIE);
         matcher.addURI(authority, MoviesDatabaseContract.PATH_REVIEWS, CODE_REVIEWS);
+        matcher.addURI(authority, MoviesDatabaseContract.PATH_REVIEWS + "/#", CODE_REVIEW);
         matcher.addURI(authority, MoviesDatabaseContract.PATH_TRAILERS, CODE_TRAILERS);
+        matcher.addURI(authority, MoviesDatabaseContract.PATH_TRAILERS + "/#", CODE_TRAILER);
         return matcher;
     }
 
@@ -41,6 +45,8 @@ public class MovieProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         Cursor cursor;
+        String movieId = uri.getLastPathSegment();
+        String[] selectionArguments = {movieId};
         switch (sUriMatcher.match(uri)) {
             case CODE_MOVIES:
                 cursor = databaseHelper.getReadableDatabase().query(MoviesDatabaseContract.MovieEntry.TABLE_NAME,
@@ -52,8 +58,6 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case CODE_MOVIE:
-                String movieId = uri.getLastPathSegment();
-                String[] selectionArguments = new String[]{movieId};
                 cursor = databaseHelper.getReadableDatabase().query(MoviesDatabaseContract.MovieEntry.TABLE_NAME,
                         projection,
                         MoviesDatabaseContract.MovieEntry._ID + " = ?",
@@ -71,11 +75,29 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+            case CODE_REVIEW:
+                cursor = databaseHelper.getReadableDatabase().query(MoviesDatabaseContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        MoviesDatabaseContract.ReviewEntry.COLUMN_MOVIE_ID + " = ?",
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder);
+                break;
             case CODE_TRAILERS:
                 cursor = databaseHelper.getReadableDatabase().query(MoviesDatabaseContract.TrailerEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case CODE_TRAILER:
+                cursor = databaseHelper.getReadableDatabase().query(MoviesDatabaseContract.TrailerEntry.TABLE_NAME,
+                        projection,
+                        MoviesDatabaseContract.TrailerEntry.COLUMN_MOVIE_ID + " = ?",
+                        selectionArguments,
                         null,
                         null,
                         sortOrder);
@@ -126,6 +148,10 @@ public class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case CODE_MOVIES:
                 return bulkInsertToTable(MoviesDatabaseContract.MovieEntry.TABLE_NAME, values, uri);
+            case CODE_TRAILERS:
+                return bulkInsertToTable(MoviesDatabaseContract.TrailerEntry.TABLE_NAME, values, uri);
+            case CODE_REVIEWS:
+                return bulkInsertToTable(MoviesDatabaseContract.ReviewEntry.TABLE_NAME, values, uri);
         }
         return super.bulkInsert(uri, values);
     }

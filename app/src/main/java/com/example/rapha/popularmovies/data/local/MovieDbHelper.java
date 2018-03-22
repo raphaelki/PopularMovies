@@ -40,7 +40,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     private String assembleReviewTableCreateCommand() {
         return "CREATE TABLE " + MoviesDatabaseContract.ReviewEntry.TABLE_NAME + " (" +
-                MoviesDatabaseContract.ReviewEntry._ID + " INTEGER PRIMARY KEY, " +
+                MoviesDatabaseContract.ReviewEntry._ID + " TEXT PRIMARY KEY ON CONFLICT REPLACE, " +
                 MoviesDatabaseContract.ReviewEntry.COLUMN_AUTHOR + " TEXT NOT NULL, " +
                 MoviesDatabaseContract.ReviewEntry.COLUMN_CONTENT + " TEXT NOT NULL, " +
                 MoviesDatabaseContract.ReviewEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
@@ -50,7 +50,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     private String assembleTrailerTableCreateCommand() {
         return "CREATE TABLE " + MoviesDatabaseContract.TrailerEntry.TABLE_NAME + " (" +
-                MoviesDatabaseContract.TrailerEntry._ID + " INTEGER PRIMARY KEY, " +
+                MoviesDatabaseContract.TrailerEntry._ID + " TEXT PRIMARY KEY ON CONFLICT REPLACE, " +
                 MoviesDatabaseContract.TrailerEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 MoviesDatabaseContract.TrailerEntry.COLUMN_YOUTUBE_KEY + " TEXT NOT NULL, " +
                 MoviesDatabaseContract.TrailerEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +

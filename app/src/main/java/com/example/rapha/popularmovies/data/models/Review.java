@@ -10,8 +10,6 @@ public class Review {
     private String author;
     @SerializedName("content")
     private String content;
-    @SerializedName("url")
-    private String url;
 
     public String getId() {
         return id;
@@ -35,13 +33,5 @@ public class Review {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 }

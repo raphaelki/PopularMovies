@@ -3,13 +3,13 @@
     <item
         android:id="@+id/action_popular"
         android:icon="@drawable/ic_whatshot_black_24dp"
-        android:title="@string/menu_spinner_popular" />
+        android:title="@string/tab_popular" />
     <item
         android:id="@+id/action_top_rated"
         android:icon="@drawable/ic_star"
-        android:title="@string/menu_spinner_top_rated" />
+        android:title="@string/tab_top_rated" />
     <item
         android:id="@+id/action_favorites"
         android:icon="@drawable/ic_favorite"
-        android:title="@string/menu_spinner_favorites" />
+        android:title="@string/tab_favorites" />
 </menu>

@@ -57,9 +57,9 @@
             android:layout_marginTop="@dimen/detail_horizontal_margin"
             android:adjustViewBounds="true"
             android:contentDescription="@string/detail_poster_content_description"
+            android:src="@drawable/placeholder"
             app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/placeholder" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/detail_cal_iv"
@@ -117,5 +117,65 @@
             app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
             app:layout_constraintTop_toBottomOf="@id/detaill_poster_iv"
             tools:text="Determined to prove herself, Officer Judy Hopps, the first bunny on Zootopia's police force, jumps at the chance to crack her first case - even if it means partnering with scam-artist fox Nick Wilde to solve the mystery." />
+
+        <TextView
+            android:id="@+id/detail_trailer_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/detail_vertical_margin"
+            android:text="@string/detail_trailers_label"
+            android:textSize="@dimen/detail_title_text_size"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/detail_plot" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/detail_trailer_label"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/detail_trailer_rv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/detail_smaller_vertical_margin"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/detail_trailer_label"
+            tools:listitem="@layout/trailer_item" />
+
+        <TextView
+            android:id="@+id/detail_reviews_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/detail_vertical_margin"
+            android:text="@string/detail_user_reviews_label"
+            android:textSize="@dimen/detail_title_text_size"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/detail_trailer_rv" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label" />
+
+        <com.example.rapha.popularmovies.details.NonScrollListView
+            android:id="@+id/detail_review_lv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:divider="@color/colorPrimary"
+            android:dividerHeight="0.5dp"
+            app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
+            app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label"
+            tools:listitem="@layout/review_item" />
+
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

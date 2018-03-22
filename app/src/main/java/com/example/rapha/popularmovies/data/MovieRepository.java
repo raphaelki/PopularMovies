@@ -1,6 +1,5 @@
 package com.example.rapha.popularmovies.data;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -14,15 +13,13 @@ public class MovieRepository {
     private RemoteRepository remoteRepository;
     private LocalRepository localRepository;
 
-    private MovieRepository(ContentResolver contentResolver) {
-        remoteRepository = new RemoteRepository();
-        localRepository = new LocalRepository(contentResolver);
+    private MovieRepository(Context context) {
+        remoteRepository = new RemoteRepository(context);
+        localRepository = new LocalRepository(context);
     }
 
-    ;
-
-    public static MovieRepository getInstance(ContentResolver contentResolver) {
-        if (INSTANCE == null) INSTANCE = new MovieRepository(contentResolver);
+    public static MovieRepository getInstance(Context context) {
+        if (INSTANCE == null) INSTANCE = new MovieRepository(context);
         return INSTANCE;
     }
 
@@ -42,11 +39,35 @@ public class MovieRepository {
         return localRepository.getMovie(movieId);
     }
 
+    public Cursor getTrailers(int movieId) {
+        return localRepository.getTrailers(movieId);
+    }
+
+    public Cursor getReviews(int movieId) {
+        return localRepository.getReviews(movieId);
+    }
+
     public void changeMovieFavoriteStatus(int movieId, boolean isFavorite) {
         localRepository.changeMovieFavoriteStatus(movieId, isFavorite);
     }
 
-    public void initialRemoteFetch(Context context) {
-        remoteRepository.initialFetch(context);
+    public void initialRemoteFetch() {
+        remoteRepository.initialFetch();
+    }
+
+    public void fetchAdditionalPopularMovies() {
+        remoteRepository.fetchAdditionalPopularMovies();
+    }
+
+    public void fetchAdditionalTopRatedMovies() {
+        remoteRepository.fetchAdditionalTopRatedMovies();
+    }
+
+    public void fetchTrailers(int movieId) {
+        remoteRepository.fetchMovieTrailers(movieId);
+    }
+
+    public void fetchReviews(int movieId) {
+        remoteRepository.fetchMovieReviews(movieId);
     }
 }

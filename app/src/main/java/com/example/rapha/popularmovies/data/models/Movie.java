@@ -1,25 +1,11 @@
 package com.example.rapha.popularmovies.data.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Movie implements Parcelable {
+public class Movie {
 
-    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
-        @Override
-        public Movie createFromParcel(Parcel in) {
-            return new Movie(in);
-        }
-
-        @Override
-        public Movie[] newArray(int size) {
-            return new Movie[size];
-        }
-    };
     @SerializedName("vote_count")
     private Integer voteCount;
     @SerializedName("id")
@@ -48,22 +34,6 @@ public class Movie implements Parcelable {
     private String overview;
     @SerializedName("release_date")
     private String releaseDate;
-
-    private Movie(Parcel in) {
-        voteCount = in.readInt();
-        id = in.readInt();
-        video = in.readInt() == 1;
-        voteAverage = in.readDouble();
-        title = in.readString();
-        popularity = in.readDouble();
-        posterPath = in.readString();
-        originalLanguage = in.readString();
-        originalTitle = in.readString();
-        backdropPath = in.readString();
-        adult = in.readInt() == 1;
-        overview = in.readString();
-        releaseDate = in.readString();
-    }
 
     public Integer getVoteCount() {
         return voteCount;
@@ -175,27 +145,5 @@ public class Movie implements Parcelable {
 
     public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(voteCount);
-        dest.writeInt(id);
-        dest.writeInt(video ? 1 : 0);
-        dest.writeDouble(voteAverage);
-        dest.writeString(title);
-        dest.writeDouble(popularity);
-        dest.writeString(posterPath);
-        dest.writeString(originalLanguage);
-        dest.writeString(originalTitle);
-        dest.writeString(backdropPath);
-        dest.writeInt(adult ? 1 : 0);
-        dest.writeString(overview);
-        dest.writeString(releaseDate);
     }
 }
