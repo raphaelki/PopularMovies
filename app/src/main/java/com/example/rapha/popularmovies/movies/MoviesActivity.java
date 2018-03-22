@@ -19,8 +19,6 @@ public class MoviesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 
-        getSupportActionBar().hide();
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         moviesFragment = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
         if (moviesFragment == null) {

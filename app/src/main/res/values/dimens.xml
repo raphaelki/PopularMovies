@@ -10,4 +10,5 @@
     <dimen name="detail_normal_text_size">16sp</dimen>
     <dimen name="detail_large_text_size">18sp</dimen>
     <dimen name="detail_title_text_size">20sp</dimen>
+    <dimen name="detail_action_button_margin">16dp</dimen>
 </resources>

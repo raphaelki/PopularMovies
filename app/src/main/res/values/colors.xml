@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4CAF50</color>
-    <color name="colorPrimaryDark">#2E7D32</color>
-    <color name="colorAccent">#69F0AE</color>
+    <color name="colorPrimary">#263238</color>
+    <color name="colorPrimaryDark">#000a12</color>
+    <color name="colorPrimaryLight">#4f5b62</color>
+    <color name="colorAccent">#00e676</color>
+    <color name="colorAccentDark">#00b248</color>
+    <color name="colorAccentLight">#66ffa6</color>
+
     <color name="poster_background_color">#000000</color>
     <color name="rating_star_color">#e4bb26</color>
     <color name="dark_grey">#4d4d4d</color>

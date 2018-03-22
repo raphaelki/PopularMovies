@@ -5,17 +5,18 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,10 +41,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView yearTv;
     private TextView ratingTv;
     private TextView plotTv;
-    private MenuItem favoriteButton;
     private RecyclerView trailerRv;
     private ListView reviewLv;
     private LinearLayoutManager trailerLayoutManager;
+    private ImageView toolbarIv;
+    private Toolbar toolbar;
+    private FloatingActionButton favoriteButton;
+    private ActionBar supportActionBar;
 
     private boolean isFavorite;
 
@@ -76,6 +80,18 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         posterIv = view.findViewById(R.id.detaill_poster_iv);
         trailerRv = view.findViewById(R.id.detail_trailer_rv);
         reviewLv = view.findViewById(R.id.detail_review_lv);
+        toolbarIv = view.findViewById(R.id.toolbar_iv);
+        toolbar = view.findViewById(R.id.toolbar);
+        favoriteButton = view.findViewById(R.id.favorite_action_button);
+
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isFavorite = !isFavorite;
+                movieRepository.changeMovieFavoriteStatus(movieId, isFavorite);
+                setFavoriteButtonIcon();
+            }
+        });
 
         movieId = getArguments().getInt("movie_id");
 
@@ -90,9 +106,19 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
         getActivity().getSupportLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
+        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
 
-        setHasOptionsMenu(true);
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onActivityCreated");
+        super.onActivityCreated(savedInstanceState);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        supportActionBar = activity.getSupportActionBar();
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void populateView(Cursor cursor) {
@@ -104,8 +130,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         plotTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
         isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
+        supportActionBar.setTitle(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
+        toolbar.setTitle(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
         String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
+        GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder_trailer).into(toolbarIv);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -169,30 +198,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     private void setFavoriteButtonIcon() {
-        favoriteButton.setIcon(isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d(TAG, "onCreateOptionsMenu");
-        inflater.inflate(R.menu.detail_menu, menu);
-        favoriteButton = menu.findItem(R.id.favorite_action);
-        callMovieLoader();
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    private void callMovieLoader() {
-        getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.favorite_action) {
-            isFavorite = !isFavorite;
-            movieRepository.changeMovieFavoriteStatus(movieId, isFavorite);
-            setFavoriteButtonIcon();
-        }
-        return super.onOptionsItemSelected(item);
+        favoriteButton.setImageResource(isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
     }
 }

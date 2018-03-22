@@ -17,8 +17,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         MovieDetailFragment movieDetailFragment = (MovieDetailFragment) fragmentManager.findFragmentById(R.id.detail_fragment_frame);
 

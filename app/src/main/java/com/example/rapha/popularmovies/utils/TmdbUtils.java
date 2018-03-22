@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TmdbUtils {
 
-    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/w185";
+    private static final String IMAGE_URL = "https://image.tmdb.org/t/p/w342";
     private static final String TMDB_DATE_PATTERN = "yyyy-MM-dd";
 
     public static String getFullImageURL(String posterPath) {
