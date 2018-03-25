@@ -68,6 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/detail_horizontal_margin"
                 android:layout_marginStart="@dimen/detail_horizontal_margin"
+                android:layout_marginTop="@dimen/detail_larger_vertical_margin"
                 android:textSize="@dimen/detail_title_text_size"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toRightOf="@id/detaill_poster_iv"
@@ -204,12 +205,10 @@
                 app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label" />
 
-            <com.example.rapha.popularmovies.details.NonScrollListView
-                android:id="@+id/detail_review_lv"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/detail_review_rv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:divider="@color/colorPrimary"
-                android:dividerHeight="0.5dp"
                 app:layout_constraintLeft_toLeftOf="@id/detail_left_margin_guideline"
                 app:layout_constraintRight_toRightOf="@id/detail_right_margin_guideline"
                 app:layout_constraintTop_toBottomOf="@+id/detail_reviews_label"

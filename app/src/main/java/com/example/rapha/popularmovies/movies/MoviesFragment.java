@@ -64,6 +64,8 @@ public class MoviesFragment extends Fragment implements
     private SwipeRefreshLayout swipeRefreshLayout;
     private BottomNavigationView bottomNavigationView;
 
+    private FetchingStateReceiver fetchingStateReceiver;
+
     private MovieRepository movieRepository;
 
     private int pageToLoad = 1;
@@ -154,10 +156,6 @@ public class MoviesFragment extends Fragment implements
         getActivity().getSupportLoaderManager().initLoader(POPULAR_MOVIES_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(TOP_RATED_MOVIES_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(FAVORITE_MOVIES_LOADER_ID, null, this);
-
-        IntentFilter intentServiceFilter = new IntentFilter(Constants.INTENT_SERVICE_BROADCAST_ACTION);
-        FetchingStateReceiver fetchingStateReceiver = new FetchingStateReceiver();
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(fetchingStateReceiver, intentServiceFilter);
 
         return view;
     }
@@ -275,6 +273,20 @@ public class MoviesFragment extends Fragment implements
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(fetchingStateReceiver);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        IntentFilter intentServiceFilter = new IntentFilter(Constants.INTENT_SERVICE_BROADCAST_ACTION);
+        fetchingStateReceiver = new FetchingStateReceiver();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(fetchingStateReceiver, intentServiceFilter);
     }
 
     private class FetchingStateReceiver extends BroadcastReceiver {

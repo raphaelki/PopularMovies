@@ -20,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.rapha.popularmovies.R;
@@ -42,19 +41,22 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView ratingTv;
     private TextView plotTv;
     private RecyclerView trailerRv;
-    private ListView reviewLv;
+    private RecyclerView reviewRv;
     private LinearLayoutManager trailerLayoutManager;
+    private LinearLayoutManager reviewLinearLayoutManager;
     private ImageView toolbarIv;
     private Toolbar toolbar;
     private FloatingActionButton favoriteButton;
     private ActionBar supportActionBar;
 
+    private String title = "TITLE";
+    private String originalTitle = "ORIGINAL TITLE";
     private boolean isFavorite;
 
     private int movieId;
     private MovieRepository movieRepository;
     private TrailerAdapter trailerAdapter;
-    private ReviewCursorAdapter reviewAdapter;
+    private ReviewAdapter reviewAdapter;
 
     public MovieDetailFragment() {
     }
@@ -79,7 +81,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         yearTv = view.findViewById(R.id.detail_year);
         posterIv = view.findViewById(R.id.detaill_poster_iv);
         trailerRv = view.findViewById(R.id.detail_trailer_rv);
-        reviewLv = view.findViewById(R.id.detail_review_lv);
+        reviewRv = view.findViewById(R.id.detail_review_rv);
         toolbarIv = view.findViewById(R.id.toolbar_iv);
         toolbar = view.findViewById(R.id.toolbar);
         favoriteButton = view.findViewById(R.id.favorite_action_button);
@@ -101,8 +103,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         trailerRv.setHasFixedSize(true);
         trailerRv.setAdapter(trailerAdapter);
 
-        reviewAdapter = new ReviewCursorAdapter(getContext(), null);
-        reviewLv.setAdapter(reviewAdapter);
+        reviewLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        reviewAdapter = new ReviewAdapter();
+        reviewRv.setAdapter(reviewAdapter);
+        reviewRv.setLayoutManager(reviewLinearLayoutManager);
 
         getActivity().getSupportLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
@@ -118,7 +122,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         supportActionBar = activity.getSupportActionBar();
+        Log.d(TAG, "action toolbar title: " + supportActionBar.getTitle());
         supportActionBar.setDisplayHomeAsUpEnabled(true);
+        supportActionBar.setTitle(title);
+        supportActionBar.setSubtitle(originalTitle);
     }
 
     private void populateView(Cursor cursor) {
@@ -130,8 +137,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         plotTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
         isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
-        supportActionBar.setTitle(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
-        toolbar.setTitle(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
+        Log.d(TAG, "Toolbar title: " + toolbar.getTitle());
+        title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
+        supportActionBar.setTitle(title);
+        Log.d(TAG, "Toolbar title: " + toolbar.getTitle());
+        originalTitle = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE));
         String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder_trailer).into(toolbarIv);
@@ -176,6 +186,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 break;
             case TRAILER_LOADER_ID:
                 if (cursor != null) {
+                    Log.d(TAG, cursor.getCount() + " trailers loaded from database");
                     if (cursor.getCount() == 0)
                         movieRepository.fetchTrailers(movieId);
                     else cursor.moveToFirst();
@@ -184,6 +195,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 break;
             case REVIEW_LOADER_ID:
                 if (cursor != null) {
+                    Log.d(TAG, cursor.getCount() + " reviews loaded from database");
                     if (cursor.getCount() == 0)
                         movieRepository.fetchReviews(movieId);
                     else cursor.moveToFirst();

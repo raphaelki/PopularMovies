@@ -8,6 +8,9 @@ public class Constants {
     public static final String FETCH_TOP_RATED_MOVIES_FINISHED_MESSAGE = "fetch_top_rated_movies_finished";
     public static final String FETCH_TRAILERS_FINISHED_MESSAGE = "fetch_trailers_finished";
     public static final String FETCH_REVIEWS_FINISHED_MESSAGE = "fetch_reviews_finished";
+    public static final String NO_TRAILERS_AVAILABLE_MESSAGE = "no_trailers_available";
+    public static final String NO_REVIEWS_AVAILABLE_MESSAGE = "no_reviews_available";
+
     public static final String NO_CONNECTION_MESSAGE = "no_connection";
 
     public static final String SHARED_PREFERENCES_KEY = "com.example.rapha.popularmovies.main_shared_prefs";

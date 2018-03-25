@@ -20,6 +20,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         MovieDetailFragment movieDetailFragment = (MovieDetailFragment) fragmentManager.findFragmentById(R.id.detail_fragment_frame);
 
+
         if (movieDetailFragment == null) {
             movieDetailFragment = new MovieDetailFragment();
             fragmentManager.beginTransaction().add(R.id.detail_fragment_frame, movieDetailFragment).commit();

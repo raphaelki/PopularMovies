@@ -126,7 +126,8 @@ public class TmdbFetchIntentService extends IntentService {
                 ContentValues[] trailerContentValues = TmdbUtils.getTrailerContentValuesformVideoList(videoResponse.getVideos(), movieId);
                 int trailersInserted = contentResolver.bulkInsert(MoviesDatabaseContract.TrailerEntry.CONTENT_URI, trailerContentValues);
                 Log.d(TAG, trailersInserted + " trailers inserted to database");
-                intentServiceBroadcaster.fireBroadcastEvent(Constants.FETCH_TRAILERS_FINISHED_MESSAGE);
+                if (trailersInserted == 0)
+                    intentServiceBroadcaster.fireBroadcastEvent(Constants.NO_TRAILERS_AVAILABLE_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -141,7 +142,8 @@ public class TmdbFetchIntentService extends IntentService {
                 ContentValues[] reviewContentValues = TmdbUtils.getReviewContentValuesformVideoList(reviewResponse.getReviews(), movieId);
                 int reviewsInserted = contentResolver.bulkInsert(MoviesDatabaseContract.ReviewEntry.CONTENT_URI, reviewContentValues);
                 Log.d(TAG, reviewsInserted + " reviews inserted to database");
-                intentServiceBroadcaster.fireBroadcastEvent(Constants.FETCH_REVIEWS_FINISHED_MESSAGE);
+                if (reviewsInserted == 0)
+                    intentServiceBroadcaster.fireBroadcastEvent(Constants.NO_REVIEWS_AVAILABLE_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
