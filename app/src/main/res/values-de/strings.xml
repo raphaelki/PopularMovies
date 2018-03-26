@@ -15,7 +15,7 @@
     <string name="detail_favorite">Favorit</string>
     <string name="detail_poster_content_description">Das Bild zeigt ein Poster des Films</string>
 
-    <string name="review_author_label">Autor:</string>
+    <string name="review_author_label">von</string>
 
     <string name="query_localization">de-DE</string>
 </resources>

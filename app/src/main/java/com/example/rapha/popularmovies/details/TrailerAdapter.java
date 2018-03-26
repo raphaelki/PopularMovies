@@ -1,5 +1,7 @@
 package com.example.rapha.popularmovies.details;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -52,17 +54,38 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     class TrailerViewHolder extends RecyclerView.ViewHolder {
 
+        private String youtubeKey;
+
         public TrailerViewHolder(View itemView) {
             super(itemView);
         }
 
-        public void bind(Cursor cursor) {
+        public void bind(final Cursor cursor) {
             TextView textView = itemView.findViewById(R.id.trailer_title);
             ImageView thumbnailImageView = itemView.findViewById(R.id.trailer_iv);
             textView.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.TrailerEntry.COLUMN_TITLE)));
-            String youtubeKey = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.TrailerEntry.COLUMN_YOUTUBE_KEY));
+            youtubeKey = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.TrailerEntry.COLUMN_YOUTUBE_KEY));
             Uri youtubeURL = YoutubeUtils.getImageUrlFromKey(youtubeKey);
             GlideApp.with(itemView.getContext()).load(youtubeURL).placeholder(R.drawable.ic_placeholder_trailer).into(thumbnailImageView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playTrailerInYoutubeApp();
+                }
+            });
+        }
+
+        private void playTrailerInYoutubeApp() {
+            Log.d(TAG, "Playing trailer:" + youtubeKey);
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youtubeKey));
+            Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + youtubeKey));
+            try {
+                itemView.getContext().startActivity(appIntent);
+            } catch (ActivityNotFoundException ex) {
+                itemView.getContext().startActivity(webIntent);
+            }
+
         }
     }
 }

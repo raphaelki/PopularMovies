@@ -163,7 +163,7 @@ public class MovieProvider extends ContentProvider {
         try {
             for (ContentValues value : values) {
                 long _id = db.insert(table, null, value);
-                if (_id != 1) {
+                if (_id != -1) {
                     rowsInserted++;
                 }
             }

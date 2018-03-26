@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/detail_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/detail_horizontal_margin"
+        android:layout_marginStart="@dimen/detail_horizontal_margin"
+        android:layout_marginTop="@dimen/detail_larger_vertical_margin"
+        android:textSize="@dimen/detail_title_text_size"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/detail_poster_iv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/detail_poster_iv"
+        tools:text="Zootopia" />
+
+    <TextView
+        android:id="@+id/detail_original_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/detail_normal_text_size"
+        android:textStyle="italic"
+        app:layout_constraintLeft_toLeftOf="@id/detail_title"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_title"
+        tools:text="Zootopia" />
+
+    <ImageView
+        android:id="@+id/detail_poster_iv"
+        android:layout_width="@dimen/detail_poster_width"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/detail_horizontal_margin"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/detail_poster_content_description"
+        android:src="@drawable/placeholder"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/detail_cal_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_date_range"
+        app:layout_constraintBottom_toBottomOf="@id/detail_year"
+        app:layout_constraintLeft_toLeftOf="@id/detail_original_title"
+        app:layout_constraintTop_toTopOf="@id/detail_year" />
+
+    <TextView
+        android:id="@+id/detail_year"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/detail_smaller_horizontal_margin"
+        android:layout_marginStart="@dimen/detail_smaller_horizontal_margin"
+        android:layout_marginTop="@dimen/detail_vertical_margin"
+        android:textSize="@dimen/detail_normal_text_size"
+        app:layout_constraintLeft_toRightOf="@id/detail_cal_iv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_original_title"
+        tools:text="2016-02-11" />
+
+    <ImageView
+        android:id="@+id/detail_star_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_star"
+        app:layout_constraintBottom_toBottomOf="@id/detail_rating"
+        app:layout_constraintLeft_toLeftOf="@id/detail_cal_iv"
+        app:layout_constraintTop_toTopOf="@id/detail_rating" />
+
+    <TextView
+        android:id="@+id/detail_rating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/detail_smaller_horizontal_margin"
+        android:layout_marginStart="@dimen/detail_smaller_horizontal_margin"
+        android:layout_marginTop="@dimen/detail_vertical_margin"
+        android:textSize="@dimen/detail_large_text_size"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/detail_star_iv"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_year"
+        tools:text="7.7/10" />
+
+    <TextView
+        android:id="@+id/detail_plot"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/detail_vertical_margin"
+        android:textSize="@dimen/detail_normal_text_size"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/detail_poster_iv"
+        tools:text="Determined to prove herself, Officer Judy Hopps, the first bunny on Zootopia's police force, jumps at the chance to crack her first case - even if it means partnering with scam-artist fox Nick Wilde to solve the mystery." />
+
+</android.support.constraint.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -12,6 +13,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -49,10 +51,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private FloatingActionButton favoriteButton;
     private ActionBar supportActionBar;
 
-    private String title = "TITLE";
-    private String originalTitle = "ORIGINAL TITLE";
-    private boolean isFavorite;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
+    private View trailersSection;
+    private View reviewSection;
 
+    private boolean isFavorite;
     private int movieId;
     private MovieRepository movieRepository;
     private TrailerAdapter trailerAdapter;
@@ -79,12 +82,16 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         plotTv = view.findViewById(R.id.detail_plot);
         ratingTv = view.findViewById(R.id.detail_rating);
         yearTv = view.findViewById(R.id.detail_year);
-        posterIv = view.findViewById(R.id.detaill_poster_iv);
+        posterIv = view.findViewById(R.id.detail_poster_iv);
         trailerRv = view.findViewById(R.id.detail_trailer_rv);
         reviewRv = view.findViewById(R.id.detail_review_rv);
+        collapsingToolbarLayout = view.findViewById(R.id.detail_collapsing_toolbar_layout);
         toolbarIv = view.findViewById(R.id.toolbar_iv);
         toolbar = view.findViewById(R.id.toolbar);
         favoriteButton = view.findViewById(R.id.favorite_action_button);
+
+        trailersSection = view.findViewById(R.id.detail_trailer_section);
+        reviewSection = view.findViewById(R.id.detail_review_section);
 
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,10 +110,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         trailerRv.setHasFixedSize(true);
         trailerRv.setAdapter(trailerAdapter);
 
-        reviewLinearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        reviewLinearLayoutManager = new LinearLayoutManager(getContext());
         reviewAdapter = new ReviewAdapter();
         reviewRv.setAdapter(reviewAdapter);
         reviewRv.setLayoutManager(reviewLinearLayoutManager);
+        reviewRv.setNestedScrollingEnabled(false);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(reviewRv.getContext(), reviewLinearLayoutManager.getOrientation());
+        reviewRv.addItemDecoration(dividerItemDecoration);
 
         getActivity().getSupportLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
@@ -122,26 +132,22 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         supportActionBar = activity.getSupportActionBar();
-        Log.d(TAG, "action toolbar title: " + supportActionBar.getTitle());
         supportActionBar.setDisplayHomeAsUpEnabled(true);
-        supportActionBar.setTitle(title);
-        supportActionBar.setSubtitle(originalTitle);
+        supportActionBar.setTitle("");
     }
 
     private void populateView(Cursor cursor) {
         Log.d(TAG, "populateView");
-        titleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE)));
+        String title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
+
+        titleTv.setText(title);
         originalTitleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE)));
         yearTv.setText(TmdbUtils.convertTmdbDateToLocalDateFormat(getContext(), cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE))));
         ratingTv.setText(getString(R.string.detail_rating, String.valueOf(cursor.getDouble(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RATING)))));
         plotTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
         isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
-        Log.d(TAG, "Toolbar title: " + toolbar.getTitle());
-        title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
-        supportActionBar.setTitle(title);
-        Log.d(TAG, "Toolbar title: " + toolbar.getTitle());
-        originalTitle = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE));
+        collapsingToolbarLayout.setTitle(title);
         String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder_trailer).into(toolbarIv);
@@ -187,18 +193,27 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             case TRAILER_LOADER_ID:
                 if (cursor != null) {
                     Log.d(TAG, cursor.getCount() + " trailers loaded from database");
-                    if (cursor.getCount() == 0)
+
+                    if (cursor.getCount() == 0) {
+                        trailersSection.setVisibility(View.GONE);
                         movieRepository.fetchTrailers(movieId);
-                    else cursor.moveToFirst();
+                    } else {
+                        cursor.moveToFirst();
+                        trailersSection.setVisibility(View.VISIBLE);
+                    }
                     trailerAdapter.swapCursor(cursor);
                 }
                 break;
             case REVIEW_LOADER_ID:
                 if (cursor != null) {
                     Log.d(TAG, cursor.getCount() + " reviews loaded from database");
-                    if (cursor.getCount() == 0)
+                    if (cursor.getCount() == 0) {
                         movieRepository.fetchReviews(movieId);
-                    else cursor.moveToFirst();
+                        reviewSection.setVisibility(View.GONE);
+                    } else {
+                        cursor.moveToFirst();
+                        reviewSection.setVisibility(View.VISIBLE);
+                    }
                     reviewAdapter.swapCursor(cursor);
                 }
                 break;

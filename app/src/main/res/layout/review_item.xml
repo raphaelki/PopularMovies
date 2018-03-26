@@ -28,20 +28,25 @@
         app:layout_constraintTop_toTopOf="@id/review_author_label"
         tools:text="Andres Gomez" />
 
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="1dp"-->
-    <!--android:background="@color/colorAccent"-->
-    <!--app:layout_constraintTop_toBottomOf="@id/review_author"/>-->
-
     <TextView
         android:id="@+id/review_content"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/detail_smaller_vertical_margin"
+        android:maxLines="2"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/review_author_label"
         tools:text="One of the best movies Disney has created in the last years. Smart plot with a great background topic talking about the differences, stereotypes, prejudices and joining the tendency of giving women more important roles.\r\n\r\nIt has still several gaps to fill and enhance on the latest point but it is, IMHO, a milestone in the right direction.\r\n\r\nThe characters work pretty well and it is funny when needed and not too full of cheesy songs." />
+
+    <ImageView
+        android:id="@+id/review_expand_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/detail_horizontal_margin"
+        android:layout_marginRight="@dimen/detail_horizontal_margin"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_arrow_drop_down"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/review_content" />
 
 </android.support.constraint.ConstraintLayout>
