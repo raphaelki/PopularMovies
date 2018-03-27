@@ -1,20 +1,17 @@
 <resources>
     <string name="app_name" translatable="false">Popular Movies</string>
     <string name="content_description">Showing poster of the movie </string>
-
+    <string name="content_description_trailer">Picture showing thumbnail of a trailer</string>
     <string name="main_no_connection">No data connection available</string>
 
-    <string name="menu_sort_order">Sort order</string>
     <string name="tab_popular">Most popular</string>
     <string name="tab_top_rated">Highest rated</string>
     <string name="tab_favorites">Favorites</string>
 
     <string name="detail_user_reviews_label">User Reviews</string>
     <string name="detail_trailers_label">Trailers</string>
-    <string name="detail_rating">%1$s/10</string>
-    <string name="detail_original_title_label">Original title:</string>
-    <string name="detail_favorite">Favorite</string>
-    <string name="detail_poster_content_description">Picture showing poster of the movie</string>
+    <string name="detail_rating" translatable="false">%1$s/10</string>
+    <string name="detail_poster_content_description">Picture showing poster of movie</string>
     <string name="detail_share_movie">Share movie</string>
     <string name="detail_share_movie_text">Watch %1$s trailer on Youtube: %2$s</string>
     <string name="detail_share_movie_title">Share trailer</string>

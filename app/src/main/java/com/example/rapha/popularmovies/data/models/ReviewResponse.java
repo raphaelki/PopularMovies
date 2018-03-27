@@ -6,12 +6,12 @@ import java.util.List;
 
 public class ReviewResponse {
 
+    @SerializedName("results")
+    private final List<Review> reviews = null;
     @SerializedName("id")
     private Integer id;
     @SerializedName("page")
     private Integer page;
-    @SerializedName("results")
-    private List<Review> reviews = null;
     @SerializedName("total_pages")
     private Integer totalPages;
     @SerializedName("total_results")

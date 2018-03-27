@@ -19,7 +19,7 @@ public class LocalRepository {
 
     private static LocalRepository INSTANCE;
     private final String TAG = getClass().getSimpleName();
-    private ContentResolver contentResolver;
+    private final ContentResolver contentResolver;
 
     private LocalRepository(Context context) {
         this.contentResolver = context.getContentResolver();

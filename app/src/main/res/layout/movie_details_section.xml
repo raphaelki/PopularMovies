@@ -41,11 +41,11 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <View
         android:id="@+id/detail_cal_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_date_range"
+        android:layout_width="@dimen/detail_icon_size"
+        android:layout_height="@dimen/detail_icon_size"
+        android:background="@drawable/ic_date_range"
         app:layout_constraintBottom_toBottomOf="@id/detail_year"
         app:layout_constraintLeft_toLeftOf="@id/detail_original_title"
         app:layout_constraintTop_toTopOf="@id/detail_year" />
@@ -63,10 +63,11 @@
         app:layout_constraintTop_toBottomOf="@id/detail_original_title"
         tools:text="2016-02-11" />
 
-    <ImageView
+    <View
         android:id="@+id/detail_star_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/detail_icon_size"
+        android:layout_height="@dimen/detail_icon_size"
+        android:background="@drawable/ic_star"
         android:src="@drawable/ic_star"
         app:layout_constraintBottom_toBottomOf="@id/detail_rating"
         app:layout_constraintLeft_toLeftOf="@id/detail_cal_iv"

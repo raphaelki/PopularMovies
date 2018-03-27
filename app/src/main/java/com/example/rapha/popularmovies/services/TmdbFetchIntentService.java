@@ -1,5 +1,6 @@
 package com.example.rapha.popularmovies.services;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +34,7 @@ public class TmdbFetchIntentService extends IntentService {
     public static final String FETCH_MOVIE_REVIEWS_ACTION = "fetch_movie_reviews";
 
     private final String TAG = getClass().getSimpleName();
-    private String apiKey = BuildConfig.TMDB_API_KEY;
+    private final String apiKey = BuildConfig.TMDB_API_KEY;
     private String localization;
     private TmdbApi tmdbApi;
     private IntentServiceBroadcaster intentServiceBroadcaster;
@@ -102,6 +103,7 @@ public class TmdbFetchIntentService extends IntentService {
         currentTopRatedMoviesPage = sharedPreferences.getInt(Constants.TOP_RATED_MOVIES_PAGE_KEY, 1);
     }
 
+    @SuppressLint("ApplySharedPref")
     private void saveCurrentPagesToSharedPrefs() {
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

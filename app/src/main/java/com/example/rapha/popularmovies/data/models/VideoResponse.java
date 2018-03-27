@@ -6,10 +6,10 @@ import java.util.List;
 
 public class VideoResponse {
 
+    @SerializedName("results")
+    private final List<Video> videos = null;
     @SerializedName("id")
     private Integer id;
-    @SerializedName("results")
-    private List<Video> videos = null;
 
     public Integer getId() {
         return id;

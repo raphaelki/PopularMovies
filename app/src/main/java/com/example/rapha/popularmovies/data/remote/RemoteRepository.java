@@ -1,5 +1,6 @@
 package com.example.rapha.popularmovies.data.remote;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,9 +13,9 @@ import com.example.rapha.popularmovies.utils.Constants;
 public class RemoteRepository {
 
     private static RemoteRepository INSTANCE;
-    private Context context;
+    private final Context context;
 
-    public RemoteRepository(Context context) {
+    private RemoteRepository(Context context) {
         this.context = context;
     }
 
@@ -29,6 +30,7 @@ public class RemoteRepository {
         callIntentService(TmdbFetchIntentService.FETCH_TOP_RATED_MOVIES_ACTION, null);
     }
 
+    @SuppressLint("ApplySharedPref")
     private void resetCurrentPagesInSharedPrefs() {
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

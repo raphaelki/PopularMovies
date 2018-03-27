@@ -52,7 +52,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
         private final String MAX_LINES = "maxLines";
         private final int EXPANSION_DURATION = 200;
-        private int collapsedLines = 1;
+        private final int collapsedLines = 1;
         private boolean isExpanded = false;
         private ImageView expandIconIv;
 

@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="detail_horizontal_margin">10dp</dimen>
-    <dimen name="detail_larger_horizontal_margin">20dp</dimen>
     <dimen name="detail_smaller_horizontal_margin">5dp</dimen>
     <dimen name="detail_vertical_margin">10dp</dimen>
     <dimen name="detail_smaller_vertical_margin">5dp</dimen>
     <dimen name="detail_larger_vertical_margin">20dp</dimen>
     <dimen name="detail_poster_width">150dp</dimen>
-
-    <dimen name="detail_normal_text_size">16sp</dimen>
-    <dimen name="detail_large_text_size">18sp</dimen>
-    <dimen name="detail_title_text_size">20sp</dimen>
-    <dimen name="detail_action_button_margin">16dp</dimen>
-
-    <dimen name="overview_favorite_icon_size">60dp</dimen>
-    <dimen name="overview_navigation_bar_height">56dp</dimen>
     <dimen name="detail_app_bar_layout_height">250dp</dimen>
     <dimen name="detail_trailer_height">180dp</dimen>
     <dimen name="detail_trailer_play_button_size">60dp</dimen>
@@ -22,6 +13,14 @@
     <dimen name="detail_trailer_min_title_size">14sp</dimen>
     <dimen name="detail_trailer_max_title_size">10sp</dimen>
     <dimen name="detail_trailer_title_granularity">1sp</dimen>
+    <dimen name="detail_normal_text_size">16sp</dimen>
+    <dimen name="detail_large_text_size">18sp</dimen>
+    <dimen name="detail_title_text_size">20sp</dimen>
+    <dimen name="detail_action_button_margin">16dp</dimen>
+    <dimen name="detail_icon_size">25dp</dimen>
+
+    <dimen name="overview_favorite_icon_size">60dp</dimen>
+    <dimen name="overview_navigation_bar_height">56dp</dimen>
 
     <dimen name="sheet_text_scrim_height_top">88dp</dimen>
     <dimen name="sheet_text_scrim_height_bottom">88dp</dimen>

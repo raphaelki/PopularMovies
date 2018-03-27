@@ -6,6 +6,8 @@ import java.util.List;
 
 public class Movie {
 
+    @SerializedName("genre_ids")
+    private final List<Integer> genreIds = null;
     @SerializedName("vote_count")
     private Integer voteCount;
     @SerializedName("id")
@@ -24,8 +26,6 @@ public class Movie {
     private String originalLanguage;
     @SerializedName("original_title")
     private String originalTitle;
-    @SerializedName("genre_ids")
-    private List<Integer> genreIds = null;
     @SerializedName("backdrop_path")
     private String backdropPath;
     @SerializedName("adult")

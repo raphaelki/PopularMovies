@@ -10,15 +10,13 @@ public class MoviesActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
 
-    private MoviesFragment moviesFragment;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movies_activity);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        moviesFragment = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
+        MoviesFragment moviesFragment = (MoviesFragment) fragmentManager.findFragmentById(R.id.movies_fragment_frame);
         if (moviesFragment == null) {
             moviesFragment = new MoviesFragment();
             fragmentManager.beginTransaction().add(R.id.movies_fragment_frame, moviesFragment).commit();

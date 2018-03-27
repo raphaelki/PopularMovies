@@ -14,13 +14,14 @@
         android:layout_marginRight="@dimen/detail_smaller_horizontal_margin"
         android:layout_marginStart="@dimen/detail_smaller_horizontal_margin"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/content_description_trailer"
         android:src="@drawable/ic_placeholder_trailer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <View
         android:id="@+id/trailer_play_button"
         android:layout_width="@dimen/detail_trailer_play_button_size"
         android:layout_height="@dimen/detail_trailer_play_button_size"
@@ -57,6 +58,7 @@
         app:layout_constraintLeft_toLeftOf="@id/trailer_text_frame"
         app:layout_constraintRight_toRightOf="@id/trailer_text_frame"
         app:layout_constraintTop_toTopOf="@id/trailer_text_frame"
+        tools:ignore="MissingPrefix"
         tools:text="Trailer No. 1" />
 
 </android.support.constraint.ConstraintLayout>

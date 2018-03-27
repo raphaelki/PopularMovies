@@ -1,5 +1,6 @@
 package com.example.rapha.popularmovies.utils;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 
@@ -21,7 +22,7 @@ public class TmdbUtils {
     }
 
     public static String convertTmdbDateToLocalDateFormat(Context context, String tmdbDate) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.TMDB_DATE_PATTERN);
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constants.TMDB_DATE_PATTERN);
         String dateShown;
         try {
             Date date = simpleDateFormat.parse(tmdbDate);

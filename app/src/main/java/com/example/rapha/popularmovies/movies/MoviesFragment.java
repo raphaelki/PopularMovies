@@ -47,13 +47,13 @@ public class MoviesFragment extends Fragment implements
     private final int FAVORITE = 2;
     private final String STATE_RECYCLER_VIEW_STATE_KEY = "recycler_view_state";
     private final String STATE_NO_CONNECTION_VISIBILITY_KEY = "no_connection_visbility";
-    private int currentTab = POPULAR;
-    private String[] projection = {
+    private final String[] projection = {
             MoviesDatabaseContract.MovieEntry._ID,
             MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
             MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH,
             MoviesDatabaseContract.MovieEntry.COLUMN_TITLE
     };
+    private int currentTab = POPULAR;
     private Cursor popularMoviesCursor;
     private Cursor topRatedMoviesCursor;
     private Cursor favoriteMovieCursor;

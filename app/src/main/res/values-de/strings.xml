@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="content_description">Poster des Films </string>
-
+    <string name="content_description_trailer">Das Bild zeigt ein Vorschaubild eines Trailers</string>
     <string name="main_no_connection">Keine Datenverbindung verfügbar</string>
 
-    <string name="menu_sort_order">Sortieren nach</string>
     <string name="tab_popular">Derzeit beliebt</string>
     <string name="tab_top_rated">Höchste Wertung</string>
     <string name="tab_favorites">Favoriten</string>
 
     <string name="detail_user_reviews_label">Nutzerkritiken</string>
     <string name="detail_trailers_label">Trailer</string>
-    <string name="detail_original_title_label">Originaltitel:</string>
-    <string name="detail_favorite">Favorit</string>
     <string name="detail_poster_content_description">Das Bild zeigt ein Poster des Films</string>
     <string name="detail_share_movie">Film teilen</string>
     <string name="detail_share_movie_text">Schau dir den %1$s Trailer auf Youtube an: %2$s</string>

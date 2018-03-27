@@ -8,7 +8,7 @@ import com.example.rapha.popularmovies.utils.Constants;
 
 public class IntentServiceBroadcaster {
 
-    private LocalBroadcastManager broadcastManager;
+    private final LocalBroadcastManager broadcastManager;
 
     public IntentServiceBroadcaster(Context context) {
         broadcastManager = LocalBroadcastManager.getInstance(context);

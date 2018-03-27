@@ -50,14 +50,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private TextView yearTv;
     private TextView ratingTv;
     private TextView plotTv;
-    private RecyclerView trailerRv;
-    private RecyclerView reviewRv;
-    private LinearLayoutManager trailerLayoutManager;
-    private LinearLayoutManager reviewLinearLayoutManager;
     private ImageView toolbarIv;
     private Toolbar toolbar;
     private FloatingActionButton favoriteButton;
-    private ActionBar supportActionBar;
 
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private View trailersSection;
@@ -94,8 +89,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         ratingTv = view.findViewById(R.id.detail_rating);
         yearTv = view.findViewById(R.id.detail_year);
         posterIv = view.findViewById(R.id.detail_poster_iv);
-        trailerRv = view.findViewById(R.id.detail_trailer_rv);
-        reviewRv = view.findViewById(R.id.detail_review_rv);
+        RecyclerView trailerRv = view.findViewById(R.id.detail_trailer_rv);
+        RecyclerView reviewRv = view.findViewById(R.id.detail_review_rv);
         collapsingToolbarLayout = view.findViewById(R.id.detail_collapsing_toolbar_layout);
         toolbarIv = view.findViewById(R.id.toolbar_iv);
         toolbar = view.findViewById(R.id.toolbar);
@@ -115,12 +110,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         movieId = getArguments().getInt(Constants.MOVIE_ID_BUNDLE_KEY);
 
         trailerAdapter = new TrailerAdapter();
-        trailerLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         trailerRv.setLayoutManager(trailerLayoutManager);
         trailerRv.setHasFixedSize(true);
         trailerRv.setAdapter(trailerAdapter);
 
-        reviewLinearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager reviewLinearLayoutManager = new LinearLayoutManager(getContext());
         reviewAdapter = new ReviewAdapter();
         reviewRv.setAdapter(reviewAdapter);
         reviewRv.setLayoutManager(reviewLinearLayoutManager);
@@ -145,7 +140,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private void setupActionBar() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
-        supportActionBar = activity.getSupportActionBar();
+        ActionBar supportActionBar = activity.getSupportActionBar();
         supportActionBar.setDisplayHomeAsUpEnabled(true);
         supportActionBar.setTitle("");
     }
@@ -253,7 +248,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     private void shareMovie() {
-        if (!title.isEmpty() && !youtubeTrailerUrl.isEmpty()) {
+        if (title != null && youtubeTrailerUrl != null) {
             String mimeType = "text/plain";
             ShareCompat.IntentBuilder
                     .from(getActivity())

@@ -1,6 +1,7 @@
 package com.example.rapha.popularmovies.movies;
 
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,22 +17,23 @@ import com.example.rapha.popularmovies.utils.TmdbUtils;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
 
     private final String TAG = getClass().getSimpleName();
-    private OnGridItemClickedHandler onGridItemClickedHandler;
+    private final OnGridItemClickedHandler onGridItemClickedHandler;
     private Cursor cursor;
 
     public MoviesAdapter(OnGridItemClickedHandler onGridItemClickedHandler) {
         this.onGridItemClickedHandler = onGridItemClickedHandler;
     }
 
+    @NonNull
     @Override
-    public MoviesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MoviesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.movie_poster_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(MoviesAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MoviesAdapter.ViewHolder holder, int position) {
         cursor.moveToPosition(position);
         holder.bind(cursor);
     }
