@@ -12,4 +12,14 @@
     <dimen name="detail_large_text_size">18sp</dimen>
     <dimen name="detail_title_text_size">20sp</dimen>
     <dimen name="detail_action_button_margin">16dp</dimen>
+
+    <dimen name="overview_favorite_icon_size">60dp</dimen>
+    <dimen name="overview_navigation_bar_height">56dp</dimen>
+    <dimen name="detail_app_bar_layout_height">250dp</dimen>
+    <dimen name="detail_trailer_height">180dp</dimen>
+    <dimen name="detail_trailer_play_button_size">60dp</dimen>
+    <dimen name="detail_trailer_text_box_height">40dp</dimen>
+    <dimen name="detail_trailer_min_title_size">14sp</dimen>
+    <dimen name="detail_trailer_max_title_size">10sp</dimen>
+    <dimen name="detail_trailer_title_granularity">1sp</dimen>
 </resources>

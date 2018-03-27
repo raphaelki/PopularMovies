@@ -36,7 +36,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public void swapCursor(Cursor newCursor) {
         if (newCursor != null) {
-            Log.d(TAG, "Cursor swapped: " + newCursor.getCount() + " reviews");
+            Log.d(TAG, "Cursor swapped");
             cursor = newCursor;
             notifyDataSetChanged();
         }
@@ -50,6 +50,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
 
+        private final String MAX_LINES = "maxLines";
         private final int EXPANSION_DURATION = 200;
         private int collapsedLines = 1;
         private boolean isExpanded = false;
@@ -75,14 +76,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         }
 
         private void expandTextView(TextView tv) {
-            ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines", tv.getLineCount());
+            ObjectAnimator animation = ObjectAnimator.ofInt(tv, MAX_LINES, tv.getLineCount());
             animation.setDuration(EXPANSION_DURATION).start();
             isExpanded = true;
             expandIconIv.setImageResource(R.drawable.ic_arrow_drop_up);
         }
 
         private void collapseTextView(TextView tv) {
-            ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines", collapsedLines);
+            ObjectAnimator animation = ObjectAnimator.ofInt(tv, MAX_LINES, collapsedLines);
             animation.setDuration(EXPANSION_DURATION).start();
             isExpanded = false;
             expandIconIv.setImageResource(R.drawable.ic_arrow_drop_down);

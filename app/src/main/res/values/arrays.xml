@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <array name="sort_order_array">
-        <item>@string/tab_popular</item>
-        <item>@string/tab_top_rated</item>
-        <item>@string/tab_favorites</item>
-    </array>
-</resources>

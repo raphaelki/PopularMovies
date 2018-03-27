@@ -19,7 +19,4 @@
     <string name="review_author_label">by</string>
 
     <string name="query_localization">en-US</string>
-    <string name="movie_parcelable_key" translatable="false">movie</string>
-
-    <string name="tmdb_base_url" translatable="false">https://api.themoviedb.org/3/movie/</string>
 </resources>

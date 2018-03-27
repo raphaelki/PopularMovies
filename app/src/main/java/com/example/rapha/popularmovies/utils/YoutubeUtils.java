@@ -4,13 +4,18 @@ import android.net.Uri;
 
 public class YoutubeUtils {
 
-    private static final String YOUTUBE_IMAGE_BASE_URL = "https://img.youtube.com/vi/";
-    private static final String YOUTUBE_IMAGE_FILENAME = "mqdefault.jpg";
-
     public static Uri getImageUrlFromKey(String youtubeKey) {
-        return Uri.parse(YOUTUBE_IMAGE_BASE_URL).buildUpon()
+        return Uri.parse(Constants.YOUTUBE_IMAGE_BASE_URL).buildUpon()
                 .appendEncodedPath(youtubeKey)
-                .appendPath(YOUTUBE_IMAGE_FILENAME)
+                .appendPath(Constants.YOUTUBE_IMAGE_FILENAME)
                 .build();
+    }
+
+    public static Uri getYoutubeAppUri(String youtubeKey) {
+        return Uri.parse(Constants.YOUTUBE_APP_LINK_BASE_URI + youtubeKey);
+    }
+
+    public static Uri getYoutubeVideoURL(String youtubeKey) {
+        return Uri.parse(Constants.YOUTUBE_BASE_VIDEO_URL + youtubeKey);
     }
 }

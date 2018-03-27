@@ -14,10 +14,9 @@
 
     <ImageView
         android:id="@+id/favorite_iv"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="@dimen/overview_favorite_icon_size"
+        android:layout_height="@dimen/overview_favorite_icon_size"
         android:layout_gravity="end"
         android:src="@drawable/ic_favorite_poster"
-
         />
 </FrameLayout>

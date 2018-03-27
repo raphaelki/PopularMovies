@@ -3,7 +3,6 @@ package com.example.rapha.popularmovies.movies;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.example.rapha.popularmovies.R;
 
@@ -15,7 +14,6 @@ public class MoviesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movies);
 

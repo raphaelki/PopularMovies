@@ -1,6 +1,5 @@
 package com.example.rapha.popularmovies.details;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,8 +24,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.rapha.popularmovies.R;
-import com.example.rapha.popularmovies.data.MovieRepository;
+import com.example.rapha.popularmovies.data.local.LocalRepository;
 import com.example.rapha.popularmovies.data.local.MoviesDatabaseContract;
+import com.example.rapha.popularmovies.data.remote.RemoteRepository;
+import com.example.rapha.popularmovies.utils.Constants;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
 
@@ -36,6 +37,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private final int DETAIL_LOADER_ID = 13452;
     private final int TRAILER_LOADER_ID = 23429;
     private final int REVIEW_LOADER_ID = 23430;
+
     private TextView titleTv;
     private TextView originalTitleTv;
     private ImageView posterIv;
@@ -57,7 +59,8 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     private boolean isFavorite;
     private int movieId;
-    private MovieRepository movieRepository;
+    private RemoteRepository remoteRepository;
+    private LocalRepository localRepository;
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
 
@@ -66,14 +69,14 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        movieRepository = MovieRepository.getInstance(getContext());
+        localRepository = LocalRepository.getInstance(getContext());
+        remoteRepository = RemoteRepository.getInstance(getContext());
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
 
         View view = inflater.inflate(R.layout.fragment_detail_movie, container, false);
 
@@ -89,7 +92,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         toolbarIv = view.findViewById(R.id.toolbar_iv);
         toolbar = view.findViewById(R.id.toolbar);
         favoriteButton = view.findViewById(R.id.favorite_action_button);
-
         trailersSection = view.findViewById(R.id.detail_trailer_section);
         reviewSection = view.findViewById(R.id.detail_review_section);
 
@@ -97,12 +99,12 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             @Override
             public void onClick(View v) {
                 isFavorite = !isFavorite;
-                movieRepository.changeMovieFavoriteStatus(movieId, isFavorite);
+                localRepository.changeMovieFavoriteStatus(movieId, isFavorite);
                 setFavoriteButtonIcon();
             }
         });
 
-        movieId = getArguments().getInt("movie_id");
+        movieId = getArguments().getInt(Constants.MOVIE_ID_BUNDLE_KEY);
 
         trailerAdapter = new TrailerAdapter();
         trailerLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -127,8 +129,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        setupActionBar();
+    }
+
+    private void setupActionBar() {
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         supportActionBar = activity.getSupportActionBar();
@@ -137,23 +142,20 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     private void populateView(Cursor cursor) {
-        Log.d(TAG, "populateView");
         String title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
-
         titleTv.setText(title);
+        collapsingToolbarLayout.setTitle(title);
         originalTitleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE)));
         yearTv.setText(TmdbUtils.convertTmdbDateToLocalDateFormat(getContext(), cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RELEASE_DATE))));
         ratingTv.setText(getString(R.string.detail_rating, String.valueOf(cursor.getDouble(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_RATING)))));
         plotTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_OVERVIEW)));
         isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
-        collapsingToolbarLayout.setTitle(title);
         String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder_trailer).into(toolbarIv);
     }
 
-    @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
@@ -193,10 +195,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             case TRAILER_LOADER_ID:
                 if (cursor != null) {
                     Log.d(TAG, cursor.getCount() + " trailers loaded from database");
-
                     if (cursor.getCount() == 0) {
                         trailersSection.setVisibility(View.GONE);
-                        movieRepository.fetchTrailers(movieId);
+                        remoteRepository.fetchMovieTrailers(movieId);
                     } else {
                         cursor.moveToFirst();
                         trailersSection.setVisibility(View.VISIBLE);
@@ -208,7 +209,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 if (cursor != null) {
                     Log.d(TAG, cursor.getCount() + " reviews loaded from database");
                     if (cursor.getCount() == 0) {
-                        movieRepository.fetchReviews(movieId);
+                        remoteRepository.fetchMovieReviews(movieId);
                         reviewSection.setVisibility(View.GONE);
                     } else {
                         cursor.moveToFirst();

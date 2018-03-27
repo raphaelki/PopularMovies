@@ -21,39 +21,19 @@ public class ReviewResponse {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Integer getPage() {
         return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
     }
 
     public List<Review> getReviews() {
         return reviews;
     }
 
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
-    }
-
     public Integer getTotalPages() {
         return totalPages;
     }
 
-    public void setTotalPages(Integer totalPages) {
-        this.totalPages = totalPages;
-    }
-
     public Integer getTotalReviews() {
         return totalReviews;
-    }
-
-    public void setTotalReviews(Integer totalReviews) {
-        this.totalReviews = totalReviews;
     }
 }

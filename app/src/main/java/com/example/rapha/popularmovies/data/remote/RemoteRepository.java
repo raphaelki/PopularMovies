@@ -11,10 +11,16 @@ import com.example.rapha.popularmovies.utils.Constants;
 
 public class RemoteRepository {
 
+    private static RemoteRepository INSTANCE;
     private Context context;
 
     public RemoteRepository(Context context) {
         this.context = context;
+    }
+
+    public static RemoteRepository getInstance(Context context) {
+        if (INSTANCE == null) INSTANCE = new RemoteRepository(context);
+        return INSTANCE;
     }
 
     public void initialFetch() {
@@ -37,12 +43,6 @@ public class RemoteRepository {
 
     public void fetchAdditionalTopRatedMovies() {
         callIntentService(TmdbFetchIntentService.FETCH_TOP_RATED_MOVIES_ACTION, null);
-    }
-
-    public void fetchMovieDetails(int movieId) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(Constants.MOVIE_ID_BUNDLE_KEY, movieId);
-        callIntentService(TmdbFetchIntentService.FETCH_MOVIE_DETAILS_ACTION, bundle);
     }
 
     public void fetchMovieTrailers(int movieId) {

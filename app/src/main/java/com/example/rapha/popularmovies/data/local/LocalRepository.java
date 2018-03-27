@@ -4,78 +4,65 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
+import com.example.rapha.popularmovies.data.models.Movie;
+import com.example.rapha.popularmovies.data.models.Review;
+import com.example.rapha.popularmovies.data.models.Video;
+import com.example.rapha.popularmovies.utils.TmdbUtils;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class LocalRepository {
 
-    private final String[] booleanTrueSelectionArgs = {"1"};
+    private static LocalRepository INSTANCE;
+    private final String TAG = getClass().getSimpleName();
     private ContentResolver contentResolver;
 
-    public LocalRepository(Context context) {
+    private LocalRepository(Context context) {
         this.contentResolver = context.getContentResolver();
     }
 
-    public Cursor getPopularMovies() {
-        String[] projection = new String[]{
-                MoviesDatabaseContract.MovieEntry._ID,
-                MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH
-        };
-        String selection = MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR + " = ?";
-        String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_POPULARITY + " DESC";
-        return contentResolver.query(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
-                projection,
-                selection,
-                booleanTrueSelectionArgs,
-                sortOrder);
+    public static LocalRepository getInstance(Context context) {
+        if (INSTANCE == null) INSTANCE = new LocalRepository(context);
+        return INSTANCE;
     }
 
-    public Cursor getTopRatedMovies() {
-        String[] projection = new String[]{
-                MoviesDatabaseContract.MovieEntry._ID,
-                MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH
-        };
-        String selection = MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED + " = ?";
-        String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_RATING + " DESC";
-        return contentResolver.query(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
-                projection,
-                selection,
-                booleanTrueSelectionArgs,
-                sortOrder);
+    public int cleanDatabase() {
+        int moviesDeleted = contentResolver.delete(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR + " = ? AND " +
+                        MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE + " = ? AND " +
+                        MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED + " = ?",
+                new String[]{"0", "0", "0"});
+        Log.d(TAG, moviesDeleted + " movies deleted from database");
+        return moviesDeleted;
     }
 
-    public Cursor getFavoriteMovies() {
-        String[] projection = new String[]{
-                MoviesDatabaseContract.MovieEntry._ID,
-                MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
-                MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH
-        };
-        String selection = MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE + " = ?";
-        String sortOrder = MoviesDatabaseContract.MovieEntry.COLUMN_DATE_ADDED_TO_FAVORITES + " DESC";
-        return contentResolver.query(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
-                projection,
-                selection,
-                booleanTrueSelectionArgs,
-                sortOrder);
+    public int insertTrailers(List<Video> videos, int movieId) {
+        ContentValues[] trailerContentValues = TmdbUtils.getTrailerContentValuesformVideoList(videos, movieId);
+        int trailersInserted = contentResolver.bulkInsert(MoviesDatabaseContract.TrailerEntry.CONTENT_URI, trailerContentValues);
+        Log.d(TAG, trailersInserted + " trailers inserted to database");
+        return trailersInserted;
     }
 
-    public Cursor getMovie(int movieId) {
-//        String[] projection = new String[]{
-//                MoviesDatabaseContract.MovieEntry._ID,
-//                MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE,
-//                MoviesDatabaseContract.MovieEntry.COLUMN_TITLE,
-//                MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH
-//        };
-        return contentResolver.query(MoviesDatabaseContract.MovieEntry.buildMovieEntryUri(movieId),
-                null,
-                null,
-                null,
-                null);
+    public int insertReviews(List<Review> reviews, int movieId) {
+        ContentValues[] reviewContentValues = TmdbUtils.getReviewContentValuesformVideoList(reviews, movieId);
+        int reviewsInserted = contentResolver.bulkInsert(MoviesDatabaseContract.ReviewEntry.CONTENT_URI, reviewContentValues);
+        Log.d(TAG, reviewsInserted + " reviews inserted to database");
+        return reviewsInserted;
+    }
+
+    public int insertMovies(List<Movie> videos, boolean isPopular, boolean isInitialFetch) {
+        if (isInitialFetch) {
+            setBooleanColumnToFalse(isPopular ? MoviesDatabaseContract.MovieEntry.COLUMN_IS_POPULAR : MoviesDatabaseContract.MovieEntry.COLUMN_IS_TOP_RATED);
+        }
+        List<Integer> favoriteIds = getListOfFavoriteIds();
+        ContentValues[] contentValues = TmdbUtils.getMovieContentValuesFromMovieList(videos, isPopular, favoriteIds);
+        int moviesInserted = contentResolver.bulkInsert(MoviesDatabaseContract.MovieEntry.CONTENT_URI, contentValues);
+        Log.d(TAG, moviesInserted + " movies inserted into database");
+        return moviesInserted;
     }
 
     public void changeMovieFavoriteStatus(int movieId, boolean isFavorite) {
@@ -86,18 +73,29 @@ public class LocalRepository {
         contentResolver.update(MoviesDatabaseContract.MovieEntry.buildMovieEntryUri(movieId), contentValues, null, null);
     }
 
-    public Cursor getTrailers(int movieId) {
-        return contentResolver.query(MoviesDatabaseContract.TrailerEntry.buildTrailerEntryUri(movieId),
-                null,
-                null,
-                null,
+    private List<Integer> getListOfFavoriteIds() {
+        String[] idProjection = {MoviesDatabaseContract.MovieEntry._ID};
+        String[] favoriteSelectionArgs = {"1"};
+        Cursor cursor = contentResolver.query(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                idProjection,
+                MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE + " = ?",
+                favoriteSelectionArgs,
                 null);
+        ArrayList<Integer> favorites = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            favorites.add(cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry._ID)));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return favorites;
     }
 
-    public Cursor getReviews(int movieId) {
-        return contentResolver.query(MoviesDatabaseContract.ReviewEntry.buildReviewEntryUri(movieId),
-                null,
-                null,
+    private void setBooleanColumnToFalse(String column) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(column, false);
+        contentResolver.update(MoviesDatabaseContract.MovieEntry.CONTENT_URI,
+                contentValues,
                 null,
                 null);
     }

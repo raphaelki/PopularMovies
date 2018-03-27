@@ -77,15 +77,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
         private void playTrailerInYoutubeApp() {
             Log.d(TAG, "Playing trailer:" + youtubeKey);
-            Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + youtubeKey));
-            Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://www.youtube.com/watch?v=" + youtubeKey));
+            Intent appIntent = new Intent(Intent.ACTION_VIEW, YoutubeUtils.getYoutubeAppUri(youtubeKey));
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, YoutubeUtils.getYoutubeVideoURL(youtubeKey));
             try {
                 itemView.getContext().startActivity(appIntent);
             } catch (ActivityNotFoundException ex) {
                 itemView.getContext().startActivity(webIntent);
             }
-
         }
     }
 }
