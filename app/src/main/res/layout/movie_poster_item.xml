@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:background="@color/poster_background_color"
-        tools:src="@drawable/placeholder" />
+        tools:src="@drawable/ic_placeholder" />
 
     <ImageView
         android:id="@+id/favorite_iv"

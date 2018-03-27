@@ -14,6 +14,10 @@
     <string name="detail_original_title_label">Originaltitel:</string>
     <string name="detail_favorite">Favorit</string>
     <string name="detail_poster_content_description">Das Bild zeigt ein Poster des Films</string>
+    <string name="detail_share_movie">Film teilen</string>
+    <string name="detail_share_movie_text">Schau dir den %1$s Trailer auf Youtube an: %2$s</string>
+    <string name="detail_share_movie_title">Teile Trailer</string>
+    <string name="detail_share_no_trailer_available_toast">Kein Trailer zum Teilen verfügbar</string>
 
     <string name="review_author_label">von</string>
 

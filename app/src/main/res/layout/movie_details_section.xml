@@ -37,7 +37,7 @@
         android:layout_marginTop="@dimen/detail_horizontal_margin"
         android:adjustViewBounds="true"
         android:contentDescription="@string/detail_poster_content_description"
-        android:src="@drawable/placeholder"
+        android:src="@drawable/ic_placeholder"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

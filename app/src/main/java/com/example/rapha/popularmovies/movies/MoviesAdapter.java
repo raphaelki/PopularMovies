@@ -71,7 +71,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             posterIv.setContentDescription(itemView.getContext().getString(R.string.content_description) + title);
             GlideApp.with(itemView.getContext())
                     .load(TmdbUtils.getFullImageURL(posterPath))
-                    .placeholder(R.drawable.placeholder)
+                    .placeholder(R.drawable.ic_placeholder)
                     .into(posterIv);
         }
 

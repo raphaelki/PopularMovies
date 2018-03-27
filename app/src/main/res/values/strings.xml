@@ -15,6 +15,10 @@
     <string name="detail_original_title_label">Original title:</string>
     <string name="detail_favorite">Favorite</string>
     <string name="detail_poster_content_description">Picture showing poster of the movie</string>
+    <string name="detail_share_movie">Share movie</string>
+    <string name="detail_share_movie_text">Watch %1$s trailer on Youtube: %2$s</string>
+    <string name="detail_share_movie_title">Share trailer</string>
+    <string name="detail_share_no_trailer_available_toast">No trailer available to share</string>
 
     <string name="review_author_label">by</string>
 

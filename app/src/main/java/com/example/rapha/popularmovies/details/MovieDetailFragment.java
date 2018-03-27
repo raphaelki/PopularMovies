@@ -8,6 +8,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -18,10 +19,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.rapha.popularmovies.R;
 import com.example.rapha.popularmovies.data.local.LocalRepository;
@@ -30,6 +35,7 @@ import com.example.rapha.popularmovies.data.remote.RemoteRepository;
 import com.example.rapha.popularmovies.utils.Constants;
 import com.example.rapha.popularmovies.utils.GlideApp;
 import com.example.rapha.popularmovies.utils.TmdbUtils;
+import com.example.rapha.popularmovies.utils.YoutubeUtils;
 
 public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -58,7 +64,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     private View reviewSection;
 
     private boolean isFavorite;
+    private String youtubeTrailerUrl;
     private int movieId;
+    private String title;
     private RemoteRepository remoteRepository;
     private LocalRepository localRepository;
     private TrailerAdapter trailerAdapter;
@@ -124,6 +132,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         getActivity().getSupportLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
         getActivity().getSupportLoaderManager().initLoader(DETAIL_LOADER_ID, null, this);
 
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -142,7 +151,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     private void populateView(Cursor cursor) {
-        String title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
+        title = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_TITLE));
         titleTv.setText(title);
         collapsingToolbarLayout.setTitle(title);
         originalTitleTv.setText(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_ORIGINAL_TITLE)));
@@ -152,7 +161,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         isFavorite = cursor.getInt(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_IS_FAVORITE)) == 1;
         setFavoriteButtonIcon();
         String fullPosterPath = TmdbUtils.getFullImageURL(cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.MovieEntry.COLUMN_POSTER_PATH)));
-        GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.placeholder).into(posterIv);
+        GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder).into(posterIv);
         GlideApp.with(getContext()).load(fullPosterPath).placeholder(R.drawable.ic_placeholder_trailer).into(toolbarIv);
     }
 
@@ -201,6 +210,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                     } else {
                         cursor.moveToFirst();
                         trailersSection.setVisibility(View.VISIBLE);
+                        setShareTrailerUrl(cursor);
                     }
                     trailerAdapter.swapCursor(cursor);
                 }
@@ -221,11 +231,42 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         }
     }
 
+    private void setShareTrailerUrl(Cursor cursor) {
+        String youtubeKey = cursor.getString(cursor.getColumnIndex(MoviesDatabaseContract.TrailerEntry.COLUMN_YOUTUBE_KEY));
+        youtubeTrailerUrl = YoutubeUtils.getYoutubeVideoURL(youtubeKey).toString();
+    }
+
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
     }
 
     private void setFavoriteButtonIcon() {
         favoriteButton.setImageResource(isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.detail_share_movie_action) {
+            shareMovie();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void shareMovie() {
+        if (!title.isEmpty() && !youtubeTrailerUrl.isEmpty()) {
+            String mimeType = "text/plain";
+            ShareCompat.IntentBuilder
+                    .from(getActivity())
+                    .setType(mimeType)
+                    .setChooserTitle(getString(R.string.detail_share_movie_title))
+                    .setText(getString(R.string.detail_share_movie_text, title, youtubeTrailerUrl))
+                    .startChooser();
+        } else
+            Toast.makeText(getContext(), R.string.detail_share_no_trailer_available_toast, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.details_toolbar, menu);
     }
 }
