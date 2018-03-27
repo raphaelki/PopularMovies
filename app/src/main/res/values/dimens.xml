@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="detail_horizontal_margin">10dp</dimen>
+    <dimen name="detail_larger_horizontal_margin">15dp</dimen>
     <dimen name="detail_smaller_horizontal_margin">5dp</dimen>
     <dimen name="detail_vertical_margin">10dp</dimen>
     <dimen name="detail_smaller_vertical_margin">5dp</dimen>
