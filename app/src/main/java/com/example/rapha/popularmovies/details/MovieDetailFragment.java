@@ -86,7 +86,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_detail_movie, container, false);
+        View view = inflater.inflate(R.layout.movie_details_fragment, container, false);
 
         titleTv = view.findViewById(R.id.detail_title);
         originalTitleTv = view.findViewById(R.id.detail_original_title);

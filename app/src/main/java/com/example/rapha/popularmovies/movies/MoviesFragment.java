@@ -74,7 +74,7 @@ public class MoviesFragment extends Fragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_movies, container, false);
+        View view = inflater.inflate(R.layout.movies_fragment, container, false);
 
         remoteRepository = RemoteRepository.getInstance(getContext());
 
