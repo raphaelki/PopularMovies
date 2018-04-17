@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-Android app that shows popular movies from [The Movie Database](https://www.themoviedb.org). The project is part of the [Android Developer Nanodegree Program](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801).
+Android app that shows popular movies from [The Movie Database](https://www.themoviedb.org).\
+This is the 2nd project of the [Android Developer Nanodegree Program](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801).
+
 The app uses the [API provided by TMDB](https://developers.themoviedb.org/3/getting-started/introduction) to retrieve the movie information and stores the data in a local SQLite database. Users can get additional information on the movie in a details view and mark movies as favorites.
 
 ## Android concepts used
